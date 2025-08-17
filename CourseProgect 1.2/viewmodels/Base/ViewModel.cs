@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace CourseProgect_1._2.ViewModels.Dase
+namespace CourseProgect_1._2.ViewModels.Base
 {
     internal abstract class ViewModel : INotifyPropertyChanged
     {
