@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml.Linq;
+using Microsoft.Win32;
 
 namespace CourseProgect_1._2.ViewModels
 {
@@ -25,12 +26,26 @@ namespace CourseProgect_1._2.ViewModels
         ConnectDataBase db;
         public ObservableCollection<Progect> Progects { get; set; }
         #endregion
+
         #region Инициализация выбраного Progect
-        private Progect _selectProgect;
-        public Progect selectProgect
+        private Progect? _Progect;
+        public Progect Progect
         {
-            get { return _selectProgect; }
-            set => Set(ref _selectProgect, value); 
+            get { return _Progect; }
+            set 
+            { 
+                Set(ref _Progect, value);
+
+
+                if (_Progect.Path is not null)
+                {
+                    var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+                    var editor = new EditWindow(_Progect.Path);
+                    currentWindow?.Close();
+                    editor.Show();
+                }
+
+            }
         }
         #endregion
 
@@ -43,20 +58,20 @@ namespace CourseProgect_1._2.ViewModels
         }
         #endregion
 
-
-        #region Команды
-
-        #region CloseApplicationCommand
-        public ICommand CloseApplicationCommand { get; set; }
-        private bool CanCloseApplicationCommandExecuted(object par) => true;
-        public void OnCloseApplicationCommandExecuted(object par) 
-        { 
-            Application.Current.Shutdown();
+        #region Функция OpenMainWindow
+        private void OpenMainWindow(string Path, object par)
+        {
+            EditWindow mainEditor = new EditWindow(Path);
+            if (par is Window window)
+                window.Close();
+            mainEditor.ShowDialog();
         }
         #endregion
 
-        #region CloseApplicationCommand
-        public ICommand CommandCreateNewProgect { get; set; }
+        #region Команды
+
+        #region CommandCreateNewProgect
+        public ICommand? CommandCreateNewProgect { get; set; }
         private bool CanCommandCreateNewProgectExecuted(object par) => true;
         public void OnCommandCreateNewProgectExecuted(object par)
         {
@@ -83,25 +98,52 @@ namespace CourseProgect_1._2.ViewModels
                 OpenMainWindow(System.IO.Path.GetDirectoryName(progect.Path), par);
             }
         }
-        #region OpenMainWindow
-        private void OpenMainWindow(string Path, object par)
+        #endregion
+
+        #region CommandExportNewProgect
+        public ICommand? CommandExportNewProgect { get; set; }
+        private bool CanCommandExportNewProgectExecuted(object par) => true;
+        public void OnCommandExportNewProgectExecuted(object par)
         {
-            EditWindow mainEditor = new EditWindow(Path);
-            if (par is Window window)
-                window.Close();
-            mainEditor.ShowDialog();
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Title = "Select a File";
+            fileDialog.Filter = "Text files (*.xml)|*.xml";
+            if (fileDialog.ShowDialog() == true)
+            {
+                string selectedFile = fileDialog.FileName;
+
+                List<Progect> pr = db.Progects.ToList();
+                foreach (Progect a in pr)
+                {
+                    if (File.Exists(a.Path))
+                    {
+                        if (a.Name == System.IO.Path.GetFileNameWithoutExtension(selectedFile))
+                        {
+                            MessageBox.Show("Данный проект уже загружен");
+                            return;
+                        }
+                    }
+                }
+                Progect progect = new Progect(System.IO.Path.GetFileNameWithoutExtension(selectedFile), selectedFile, DateTime.Now.ToString("d"));
+                db.Progects.Add(progect);
+                db.SaveChanges();
+                OpenMainWindow(System.IO.Path.GetDirectoryName(progect.Path), par);
+            }
         }
         #endregion
+
         #endregion
-        #endregion
+
         public MainWindowViewModel() 
         {
+            #region Вывод данных из БД
+
             db = new ConnectDataBase();
             Progects = new ObservableCollection<Progect>();
 
             List<Progect> pr = db.Progects.ToList();
-            pr.Sort((x, y) => x.Last_call_date.CompareTo(y.Last_call_date));
-            foreach (Progect a in db.Progects)
+            pr.Sort((x, y) => y.Last_call_date.CompareTo(x.Last_call_date));
+            foreach (Progect a in pr)
             {
                 if (File.Exists(a.Path))
                 {
@@ -109,18 +151,17 @@ namespace CourseProgect_1._2.ViewModels
                     Progects.Add(_selectProgect);
                 }
             }
+
+            #endregion
+
             #region Команды
             #region CommandCreateNewProgect
             CommandCreateNewProgect = new LambdaCommand(OnCommandCreateNewProgectExecuted, CanCommandCreateNewProgectExecuted);
             #endregion
+            #region CommandExportNewProgect
+            CommandExportNewProgect = new LambdaCommand(OnCommandExportNewProgectExecuted, CanCommandExportNewProgectExecuted);
             #endregion
-
-            #region Загрузка БД
-            db.Database.EnsureCreated();
-            db.Progects.Load();
-            Progects = db.Progects.Local.ToObservableCollection();
             #endregion
-
         }
     }
 }
