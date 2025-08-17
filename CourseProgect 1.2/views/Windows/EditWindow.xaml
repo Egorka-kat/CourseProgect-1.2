@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourseProgect_1._2.Views.Windows"
         xmlns:vm="clr-namespace:CourseProgect_1._2.ViewModels"
+        
         mc:Ignorable="d"
         Title="EditWindow" Height="450" Width="800">
     <DockPanel>

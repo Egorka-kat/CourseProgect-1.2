@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourseProgect_1._2.views.Windows"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:vm ="clr-namespace:CourseProgect_1._2.viewmodels"
         mc:Ignorable="d"
-        Height="100" Width="300"  ResizeMode="NoResize" WindowStyle="None">
+        Height="140" Width="316"  ResizeMode="NoResize">
+    <Window.DataContext>
+        <vm:WFEPN_ViewModel/>
+    </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="7*"/>
@@ -17,13 +21,13 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Grid.Column="0">
-            <TextBox Margin="10"/>
-            <TextBox Margin="10,0,10,10"/>
+            <TextBox  x:Name="TextBoxNameProgect" Text="{Binding TextBox_NameProgect, UpdateSourceTrigger=PropertyChanged}"  Margin="10" />
+            <TextBox x:Name="TextBoxPathProgect" Text="{Binding TextBox_PathProgect}" Margin="10,0,10,10" IsReadOnly="True"/>
         </StackPanel>
-        <Button Grid.Column="1" Grid.Row="0" Margin="10,38,10,15" Style="{StaticResource BTND}">
+        <Button Command="{Binding OpenExplorer}"  Grid.Column="1" Grid.Row="0" Margin="10,38,10,16" Style="{StaticResource BTND}">
             <fa:ImageAwesome Icon="FolderOutlinepenOutline" Margin="1.5"  VerticalAlignment="Center" HorizontalAlignment="Center" />
         </Button>
-        <Button Grid.Row="1" Content="Отмена" Grid.Column="0" Margin="200,5,10,5"  Style="{StaticResource BTND}"/>
-        <Button Grid.Row="1" Content="Ок" Grid.Column="1" Margin="10,5,10,5"  Style="{StaticResource BTND}"/>
+        <Button Command="{Binding CloseWindowCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="1" Content="Отмена" Grid.Column="0" Margin="190,4,10,4"  Style="{StaticResource BTND}"/>
+        <Button Command="{Binding ClickOk}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="1" Content="Ок" Grid.Column="1" Margin="10,4,10,4"  Style="{StaticResource BTND}"/>
     </Grid>
 </Window>

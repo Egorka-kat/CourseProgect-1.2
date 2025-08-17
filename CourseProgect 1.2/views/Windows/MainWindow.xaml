@@ -15,13 +15,14 @@
             <Button Content="Создать новый проект" Margin="10,0,10,10" Command="{Binding CommandCreateNewProgect}" MinHeight="60" VerticalAlignment="Bottom" HorizontalAlignment="Right" MinWidth="190" />
         </StackPanel>
         <ScrollViewer DockPanel.Dock="Left" Margin="10,10,0,10" MinHeight="300" MinWidth="400" HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
-            <ListBox> <!--добавить  ItemSourse-->
-                <ListBox.ItemTemplate> <!--добавить  selectItem-->
+            <ListBox ItemsSource="{Binding Progects}"
+                     SelectedItem="{Binding selectProgect}">
+                <ListBox.ItemTemplate > 
                     <DataTemplate>
                         <StackPanel Margin="10">
-                            <TextBlock FontSize="12" Text="" />
-                            <TextBlock FontSize="8" Text="" />
-                            <TextBlock FontSize="10" Text="" />
+                            <TextBlock FontSize="12" Text="{Binding Path=Name}" />
+                            <TextBlock FontSize="8" Text="{Binding Path=Path}" />
+                            <TextBlock FontSize="10" Text="{Binding Path=Last_call_date}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

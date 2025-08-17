@@ -19,7 +19,7 @@ namespace CourseProgect_1._2.Views.Windows
     /// </summary>
     public partial class EditWindow : Window
     {
-        public EditWindow()
+        public EditWindow(string path)
         {
             InitializeComponent();
         }
