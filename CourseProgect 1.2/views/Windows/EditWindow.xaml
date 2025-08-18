@@ -5,9 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourseProgect_1._2.Views.Windows"
         xmlns:vm="clr-namespace:CourseProgect_1._2.ViewModels"
-        
+        xmlns:mod="clr-namespace:CourseProgect_1._2.models"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="EditWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <vm:EW_ViewModel/>
+    </Window.DataContext>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Файл"/>
@@ -19,7 +24,21 @@
                     <ColumnDefinition Width="127*"/>
                     <ColumnDefinition Width="35*" MaxWidth="350"/>
                 </Grid.ColumnDefinitions>
-                <TreeView Grid.Column="0" Height="auto" Width="auto" VerticalAlignment="Top" Margin="8" />
+                <TreeView Margin="6" ItemsSource="{Binding FileSystemItems}">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type mod:FileSystemItem}" 
+                                     ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <fa:ImageAwesome Margin="0,0,5,0" Width="10" 
+                                                 Icon="{Binding IsDirectory, Converter={StaticResource IconConverter}}" 
+                                                 VerticalAlignment="Center" 
+                                                 HorizontalAlignment="Center" 
+                                                 />
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
                 <GridSplitter
                     Margin="0,5,0,5"
                     Grid.Column="0" 

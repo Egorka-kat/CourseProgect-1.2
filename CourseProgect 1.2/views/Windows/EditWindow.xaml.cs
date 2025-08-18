@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CourseProgect_1._2.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,19 @@ namespace CourseProgect_1._2.Views.Windows
     /// </summary>
     public partial class EditWindow : Window
     {
+        private readonly string _PathParameter;
         public EditWindow(string path)
         {
+            _PathParameter = path;
             InitializeComponent();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is EW_ViewModel vm)
+            {
+                vm.LoadPath = _PathParameter; // Передаём параметр в ViewModel
+            }
         }
     }
 }

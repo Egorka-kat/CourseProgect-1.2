@@ -40,7 +40,7 @@ namespace CourseProgect_1._2.ViewModels
                 if (_Progect.Path is not null)
                 {
                     var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
-                    var editor = new EditWindow(_Progect.Path);
+                    var editor = new EditWindow(System.IO.Path.GetDirectoryName(_Progect.Path));
                     currentWindow?.Close();
                     editor.Show();
                 }

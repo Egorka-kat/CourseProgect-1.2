@@ -33,9 +33,5 @@ namespace CourseProgect_1._2.Models
             this.Last_call_date = Last_call_date;
             this.Tag = Tag;
         }
-        public string Full_details_for_implementation
-        {
-            get { return Name + "\t" + Last_call_date + "\n" + Path; }
-        }
     }
 }
