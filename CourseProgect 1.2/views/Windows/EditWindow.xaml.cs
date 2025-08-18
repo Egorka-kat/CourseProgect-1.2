@@ -31,7 +31,7 @@ namespace CourseProgect_1._2.Views.Windows
         {
             if (DataContext is EW_ViewModel vm)
             {
-                vm.LoadPath = _PathParameter; // Передаём параметр в ViewModel
+                vm.LoadPath = _PathParameter;
             }
         }
     }
