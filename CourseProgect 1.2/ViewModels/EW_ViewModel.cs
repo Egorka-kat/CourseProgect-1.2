@@ -142,22 +142,134 @@ namespace CourseProgect_1._2.ViewModels
         #endregion
 
         #region DeleteChildCommand
-        public ICommand? DeleteChildCommand { get; set; }
-        private bool CanDeleteChildCommandExecuted(object par) => true;
-        public void OnDeleteChildCommandExecuted(object par)
+        public ICommand? DeleteCommand { get; set; }
+        private bool CanDeleteCommandExecuted(object par) => true;
+        public async void OnDeleteCommandExecuted(object par)
         {
-            if (!Equals(par))
+            if (par is not FileSystemItem item) return;
+
+            try
             {
-                FileSystemItem Chil = par as FileSystemItem;
-                File.Delete(Chil.FullPath);
+                // Запрос подтверждения удаления
+                var result = MessageBox.Show(
+                    $"Вы уверены, что хотите удалить {(item.IsDirectory ? "папку" : "файл")} '{item.Name}'?",
+                    "Подтверждение удаления",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result != MessageBoxResult.Yes) return;
+
+                // Удаление файла/папки
+                if (item.IsDirectory)
+                {
+                    Directory.Delete(item.FullPath, true);
+                }
+                else
+                {
+                    File.Delete(item.FullPath);
+                }
+
+                // Удаляем элемент из родительской коллекции в UI потоке
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    RemoveItemFromTree(item);
+                });
+
+                // Уведомление об успешном удалении
+                MessageBox.Show($"'{item.Name}' успешно удален", "Успех",
+                               MessageBoxButton.OK, MessageBoxImage.Information);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                MessageBox.Show($"Нет прав для удаления: {ex.Message}", "Ошибка",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Файл используется другой программой: {ex.Message}", "Ошибка",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RemoveItemFromTree(FileSystemItem itemToDelete)
+        {
+            // Ищем родительский элемент в корневых элементах
+            foreach (var rootItem in FileSystemItems)
+            {
+                if (RemoveFromChildren(rootItem, itemToDelete))
+                {
+                    return;
+                }
+            }
+        }
+
+        private bool RemoveFromChildren(FileSystemItem parent, FileSystemItem itemToDelete)
+        {
+            // Проверяем прямых детей
+            if (parent.Children?.Contains(itemToDelete) == true)
+            {
+                parent.Children.Remove(itemToDelete);
+                return true;
+            }
+
+            // Рекурсивно проверяем детей
+            if (parent.Children != null)
+            {
+                foreach (var child in parent.Children.ToList()) // ToList() для избежания модификации во время итерации
+                {
+                    if (RemoveFromChildren(child, itemToDelete))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void RemoveItemFromParent(FileSystemItem itemToDelete)
+        {
+            // Ищем родительский элемент в дереве
+            foreach (var rootItem in FileSystemItems)
+            {
+                var parent = FindParent(rootItem, itemToDelete);
+                if (parent != null)
+                {
+                    parent.Children.Remove(itemToDelete);
+                    return;
+                }
+            }
+        }
+
+        private FileSystemItem FindParent(FileSystemItem current, FileSystemItem target)
+        {
+            if (current.Children.Contains(target))
+            {
+                return current;
+            }
+
+            foreach (var child in current.Children)
+            {
+                var parent = FindParent(child, target);
+                if (parent != null)
+                {
+                    return parent;
+                }
+            }
+
+            return null;
         }
         #endregion
 
         public EW_ViewModel()
         {
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
-            DeleteChildCommand =new LambdaCommand(OnDeleteChildCommandExecuted, CanDeleteChildCommandExecuted);
+            DeleteCommand = new LambdaCommand(OnDeleteCommandExecuted, CanDeleteCommandExecuted);
         }
     }
 }

@@ -16,15 +16,15 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Margin="2,0,2,0"
-                Command="{Binding ClosingTreeView}" 
-                      CommandParameter="{Binding ElementName=Col1}">
+            Command="{Binding ClosingTreeView}" 
+                  CommandParameter="{Binding ElementName=Col1}">
                 <MenuItem.Icon>
                     <fa:FontAwesome 
-                        Icon="{Binding PanelIcon}"
-                            Height="14"
-                            />
+                    Icon="{Binding PanelIcon}"
+                        Height="14"
+                        />
                 </MenuItem.Icon>
-            </MenuItem> 
+            </MenuItem>
             <MenuItem Header="Файл"/>
         </Menu>
         <DockPanel DockPanel.Dock="Bottom">
@@ -36,14 +36,26 @@
                 </Grid.ColumnDefinitions>
                 <TreeView Margin="6" ItemsSource="{Binding FileSystemItems}">
                     <TreeView.Resources>
+                        <ContextMenu x:Key="ItemContextMenu">
+                            <MenuItem Header="Открыть" 
+                      Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+                      CommandParameter="{Binding}"/>
+                            <MenuItem Header="Удалить" 
+                      Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+                      CommandParameter="{Binding}"/>
+                        </ContextMenu>
+
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
+                        </Style>
+
                         <HierarchicalDataTemplate DataType="{x:Type mod:FileSystemItem}" 
-                                     ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal" Tag="{Binding Children}">
+                     ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
                                 <fa:ImageAwesome Margin="0,0,5,0" Width="10" 
-                                                 Icon="{Binding IsDirectory, Converter={StaticResource IconConverter}}" 
-                                                 VerticalAlignment="Center" 
-                                                 HorizontalAlignment="Center" 
-                                                 />
+                                 Icon="{Binding IsDirectory, Converter={StaticResource IconConverter}}" 
+                                 VerticalAlignment="Center" 
+                                 HorizontalAlignment="Center" />
                                 <TextBlock Text="{Binding Name}"/>
                             </StackPanel>
                         </HierarchicalDataTemplate>
