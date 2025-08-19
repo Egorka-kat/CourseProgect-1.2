@@ -3,6 +3,7 @@ using CourseProgect_1._2.models;
 using CourseProgect_1._2.Models;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
+using CourseProgect_1._2.Views.Windows;
 using FontAwesome.WPF;
 using System;
 using System.Collections.Generic;
@@ -24,8 +25,7 @@ namespace CourseProgect_1._2.ViewModels
     class EW_ViewModel : ViewModel
     {
         public ObservableCollection<FileSystemItem> FileSystemItems { get; } = new ObservableCollection<FileSystemItem>();
-        IconTreeView IconTreeView = new IconTreeView();
-       
+
         private GridLength _ColumnWigth = new GridLength(200);
         public GridLength ColumnWigth
         {
@@ -105,42 +105,59 @@ namespace CourseProgect_1._2.ViewModels
 
 
         #region ClosingTreeView
+        private bool _isPanelClosed = false;
+        public bool IsPanelClosed
+        {
+            get => _isPanelClosed;
+            set
+            {
+                _isPanelClosed = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(PanelIcon));
+            }
+        }
+
+        public FontAwesomeIcon PanelIcon =>
+            IsPanelClosed ? FontAwesomeIcon.AngleDoubleLeft : FontAwesomeIcon.AngleDoubleRight;
         public ICommand? ClosingTreeView { get; set; }
         private bool CanClosingTreeViewExecuted(object par) => true;
         public void OnClosingTreeViewExecuted(object par)
         {
             if (!Equals(par))
             {
-                MenuItem MI = par as MenuItem;
-                if (!IconTreeView.isClosingTreeView)
+                ColumnDefinition COL = par as ColumnDefinition;
+                if (!IsPanelClosed)
                 {
-                    MI.Icon = new ImageAwesome
-                    {
-                        Icon = FontAwesomeIcon.AngleDoubleRight,
-                        Height = 7
-                    };
-                    FixedWidth = ColumnWigth;
-                    ColumnWigth = new GridLength(10);
-                    IconTreeView.isClosingTreeView = true;
+                    FixedWidth = COL.Width;
+                    COL.Width = new GridLength(0);
+                    IsPanelClosed = true;
                 }
                 else
                 {
-                    MI.Icon = new ImageAwesome
-                    {
-                        Icon = FontAwesomeIcon.AngleDoubleLeft,
-                        Height = 7
-                    };
-                    ColumnWigth = FixedWidth;
-                    IconTreeView.isClosingTreeView = false;
+                    COL.Width = FixedWidth;
+                    IsPanelClosed = false;
                 }
             }
         }
         #endregion
 
+        #region DeleteChildCommand
+        public ICommand? DeleteChildCommand { get; set; }
+        private bool CanDeleteChildCommandExecuted(object par) => true;
+        public void OnDeleteChildCommandExecuted(object par)
+        {
+            if (!Equals(par))
+            {
+                FileSystemItem Chil = par as FileSystemItem;
+                File.Delete(Chil.FullPath);
+            }
+        }
+        #endregion
 
         public EW_ViewModel()
         {
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
+            DeleteChildCommand =new LambdaCommand(OnDeleteChildCommandExecuted, CanDeleteChildCommandExecuted);
         }
     }
 }

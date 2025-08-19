@@ -5,18 +5,18 @@ using System.Windows.Data;
 
 namespace CourseProgect_1._2.models
 {
-    class IconTreeView : IValueConverter
+    public class IconTreeView : IValueConverter
     {
-        public bool isClosingTreeView = false;
+        
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool isDirectory)
+            if (value is bool isOpen)
             {
-                return isDirectory
-                    ? FontAwesomeIcon.AngleDoubleLeft.ToString()  
-                    : FontAwesomeIcon.AngleDoubleRight.ToString();    
+                // Для булевых значений
+                return isOpen ? FontAwesomeIcon.AngleDoubleRight : FontAwesomeIcon.AngleDoubleLeft;
             }
-            return FontAwesomeIcon.Question.ToString();   // Иконка по умолчанию
+            // Значение по умолчанию
+            return FontAwesomeIcon.AngleDoubleRight;
         }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

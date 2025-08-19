@@ -13,5 +13,6 @@ namespace CourseProgect_1._2.models
         public string FullPath { get; set; }
         public bool IsDirectory { get; set; }
         public ObservableCollection<FileSystemItem> Children { get; set; } = new ObservableCollection<FileSystemItem>();
+
     }
 }
