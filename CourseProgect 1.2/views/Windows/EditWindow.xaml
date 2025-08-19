@@ -40,6 +40,9 @@
                             <MenuItem Header="Открыть" 
                       Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
                       CommandParameter="{Binding}"/>
+                            <MenuItem Header="Пеоеименовать" 
+Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+CommandParameter="{Binding}"/>
                             <MenuItem Header="Удалить" 
                       Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
                       CommandParameter="{Binding}"/>

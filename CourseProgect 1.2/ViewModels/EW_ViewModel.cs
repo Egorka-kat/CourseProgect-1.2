@@ -24,7 +24,7 @@ namespace CourseProgect_1._2.ViewModels
 {
     class EW_ViewModel : ViewModel
     {
-        public ObservableCollection<FileSystemItem> FileSystemItems { get; } = new ObservableCollection<FileSystemItem>();
+        public ObservableCollection<FileSystemItem> FileSystemItems { get; set; } = new ObservableCollection<FileSystemItem>();
 
         private GridLength _ColumnWigth = new GridLength(200);
         public GridLength ColumnWigth
@@ -141,7 +141,7 @@ namespace CourseProgect_1._2.ViewModels
         }
         #endregion
 
-        #region DeleteChildCommand
+        #region DeleteCommand
         public ICommand? DeleteCommand { get; set; }
         private bool CanDeleteCommandExecuted(object par) => true;
         public async void OnDeleteCommandExecuted(object par)
@@ -195,7 +195,180 @@ namespace CourseProgect_1._2.ViewModels
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        #endregion
+        #region RenameCommand
+        public ICommand? RenameCommand { get; set; }
+        private bool CanRenameCommandExecuted(object par) => par is FileSystemItem item &&
+                                                   !string.IsNullOrEmpty(item.FullPath) &&
+                                                   (item.IsDirectory ? Directory.Exists(item.FullPath) : File.Exists(item.FullPath));
+        public async void OnRenameCommandExecuted(object par)
+        {
+            if (par is not FileSystemItem item) return;
 
+            try
+            {
+                // Используем VisualBasic InputBox
+                string newName = await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    return Microsoft.VisualBasic.Interaction.InputBox(
+                        "Введите новое имя:",
+                        "Переименование",
+                        item.Name);
+                });
+
+                if (string.IsNullOrEmpty(newName)) return;
+                if (newName == item.Name) return;
+
+                string directoryPath = System.IO.Path.GetDirectoryName(item.FullPath)!;
+                string newFullPath = System.IO.Path.Combine(directoryPath, newName);
+
+                // Проверка на существование
+                bool exists = await Task.Run(() => item.IsDirectory ?
+                    Directory.Exists(newFullPath) : File.Exists(newFullPath));
+
+                if (exists)
+                {
+                    MessageBox.Show("Файл или папка с таким именем уже существует", "Ошибка",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // Переименование
+                await Task.Run(() =>
+                {
+                    if (item.IsDirectory)
+                    {
+                        Directory.Move(item.FullPath, newFullPath);
+                    }
+                    else
+                    {
+                        File.Move(item.FullPath, newFullPath);
+                        item.Name = System.IO.Path.GetFileName(newFullPath);
+                    }
+                });
+
+                //Обновление TreeView
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    item.Name = newName;
+                    item.FullPath = newFullPath;
+                    RefreshTreeView();
+                });
+
+                MessageBox.Show($"'{item.Name}' переименован в '{newName}'", "Успех",
+                              MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при переименовании: {ex.Message}", "Ошибка",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void RefreshTreeView()
+        {
+            foreach (var item in FileSystemItems.ToList())
+            {
+                RefreshFileSystemItem(item);
+            }
+
+            OnPropertyChanged(nameof(FileSystemItems));
+        }
+        private void RefreshFileSystemItem(FileSystemItem item)
+        {
+            if (item.IsDirectory)
+            {
+                // Проверяем существует ли директория
+                if (!Directory.Exists(item.FullPath))
+                {
+                    // Удаляем несуществующий элемент
+                    RemoveItemFromTree(item);
+                    return;
+                }
+
+                // Обновляем детей директории
+                RefreshDirectoryChildren(item);
+            }
+            else
+            {
+                // Проверяем существует ли файл
+                if (!File.Exists(item.FullPath))
+                {
+                    RemoveItemFromTree(item);
+                    return;
+                }
+
+                // Обновляем информацию о файле
+                var fileInfo = new FileInfo(item.FullPath);
+                item.Name = fileInfo.Name;
+                OnPropertyChanged(nameof(item.Name));
+                RefreshDirectoryChildren(item);
+            }
+        }
+
+        private void RefreshDirectoryChildren(FileSystemItem directory)
+        {
+            if (!Directory.Exists(directory.FullPath)) return;
+
+            try
+            {
+                // Получаем текущие файлы и папки
+                var currentDirs = Directory.GetDirectories(directory.FullPath);
+                var currentFiles = Directory.GetFiles(directory.FullPath);
+
+                var currentPaths = currentDirs.Concat(currentFiles).ToHashSet();
+
+                // Удаляем несуществующие элементы
+                for (int i = directory.Children.Count - 1; i >= 0; i--)
+                {
+                    var child = directory.Children[i];
+                    if (!currentPaths.Contains(child.FullPath))
+                    {
+                        directory.Children.RemoveAt(i);
+                    }
+                }
+
+                // Добавляем новые элементы
+                foreach (var dirPath in currentDirs)
+                {
+                    if (!directory.Children.Any(c => c.FullPath == dirPath))
+                    {
+                        var dirInfo = new DirectoryInfo(dirPath);
+                        directory.Children.Add(new FileSystemItem
+                        {
+                            Name = dirInfo.Name,
+                            FullPath = dirInfo.FullName,
+                            IsDirectory = true,
+                            Children = new ObservableCollection<FileSystemItem>()
+                        });
+                    }
+                }
+
+                foreach (var filePath in currentFiles)
+                {
+                    if (!directory.Children.Any(c => c.FullPath == filePath))
+                    {
+                        var fileInfo = new FileInfo(filePath);
+                        directory.Children.Add(new FileSystemItem
+                        {
+                            Name = fileInfo.Name,
+                            FullPath = fileInfo.FullName,
+                            IsDirectory = false
+                        });
+                    }
+                }
+
+                // Рекурсивно обновляем детей
+                foreach (var child in directory.Children.Where(c => c.IsDirectory))
+                {
+                    RefreshFileSystemItem(child);
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Пропускаем директории без доступа
+            }
+        }
+        #endregion
         private void RemoveItemFromTree(FileSystemItem itemToDelete)
         {
             // Ищем родительский элемент в корневых элементах
@@ -232,20 +405,6 @@ namespace CourseProgect_1._2.ViewModels
             return false;
         }
 
-        private void RemoveItemFromParent(FileSystemItem itemToDelete)
-        {
-            // Ищем родительский элемент в дереве
-            foreach (var rootItem in FileSystemItems)
-            {
-                var parent = FindParent(rootItem, itemToDelete);
-                if (parent != null)
-                {
-                    parent.Children.Remove(itemToDelete);
-                    return;
-                }
-            }
-        }
-
         private FileSystemItem FindParent(FileSystemItem current, FileSystemItem target)
         {
             if (current.Children.Contains(target))
@@ -264,12 +423,12 @@ namespace CourseProgect_1._2.ViewModels
 
             return null;
         }
-        #endregion
 
         public EW_ViewModel()
         {
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
             DeleteCommand = new LambdaCommand(OnDeleteCommandExecuted, CanDeleteCommandExecuted);
+            RenameCommand = new LambdaCommand(OnRenameCommandExecuted, CanRenameCommandExecuted);
         }
     }
 }

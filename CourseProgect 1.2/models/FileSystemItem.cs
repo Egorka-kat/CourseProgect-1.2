@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CourseProgect_1._2.ViewModels.Base;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CourseProgect_1._2.models
 {
-    class FileSystemItem
+    class FileSystemItem 
     {
         public string Name { get; set; }
         public string FullPath { get; set; }
