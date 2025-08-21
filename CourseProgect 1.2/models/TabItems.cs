@@ -1,5 +1,6 @@
 ﻿using CourseProgect_1._2.ViewModels.Base;
 using ICSharpCode.AvalonEdit.Document;
+using ICSharpCode.AvalonEdit.Highlighting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,9 @@ namespace CourseProgect_1._2.models
         private string _TitleName;
         public string TitleName { get => _TitleName; set => Set(ref _TitleName, value); }
         private string _Path;
-        public string Path { get => _Path; set => Set(ref _Path, value); }
+        public string Path { get => _Path;
+            set { Set(ref _Path, value); UpdateSyntaxHighlightingFromExtension(); } 
+        }
         private TextDocument _document;
         public TextDocument Document
         {
@@ -23,7 +26,6 @@ namespace CourseProgect_1._2.models
                 Set(ref _document, value);
             }
         }
-
         private string _Text;
         public string Text
         {
@@ -39,6 +41,33 @@ namespace CourseProgect_1._2.models
                     }
                 }
             }
+        }
+
+        public IHighlightingDefinition SyntaxHighlighting { get; private set; }
+
+        private void UpdateSyntaxHighlightingFromExtension()
+        {
+            if (string.IsNullOrEmpty(Path))
+            {
+                SyntaxHighlighting = null;
+                return;
+            }
+
+            var extension = System.IO.Path.GetExtension(Path).ToLower();
+
+            SyntaxHighlighting = extension switch
+            {
+                ".cs" => HighlightingManager.Instance.GetDefinition("C#"),
+                ".html" or ".htm" => HighlightingManager.Instance.GetDefinition("HTML"),
+                ".xml" => HighlightingManager.Instance.GetDefinition("XML"),
+                ".js" => HighlightingManager.Instance.GetDefinition("JavaScript"),
+                ".sql" => HighlightingManager.Instance.GetDefinition("SQL"),
+                ".css" => HighlightingManager.Instance.GetDefinition("CSS"),
+                ".py" => HighlightingManager.Instance.GetDefinition("Python"),
+                _ => null
+            };
+
+            OnPropertyChanged(nameof(SyntaxHighlighting));
         }
 
         public bool isSave;

@@ -147,7 +147,7 @@ namespace CourseProgect_1._2.ViewModels
                 OnPropertyChanged(nameof(PanelIcon));
             }
         }
-
+        
         public FontAwesomeIcon PanelIcon =>
             IsPanelClosed ? FontAwesomeIcon.AngleDoubleLeft : FontAwesomeIcon.AngleDoubleRight;
         public ICommand? ClosingTreeView { get; set; }
