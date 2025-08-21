@@ -4,20 +4,29 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Test"
-        xmlns:mod="clr-namespace:Test.models"
+         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="AvalonEdit Demo" Height="450" Width="800">
     <Grid>
-        <TreeView ItemsSource="{Binding FileSystemItems}">
-            <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type mod:FileSystemItem}" 
-                                  ItemsSource="{Binding Children}">
-                    <!-- Визуальное представление элемента -->
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Name}" Margin="5,0"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>
-        </TreeView>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Текстовый редактор AvalonEdit -->
+        <avalonEdit:TextEditor 
+            x:Name="TextEditor"
+            Grid.Row="0"
+            SyntaxHighlighting="HTML"
+            FontFamily="Consolas"
+            FontSize="12pt"
+            ShowLineNumbers="True"
+            WordWrap="False"/>
+
+        <!-- Панель с кнопками -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+            <Button x:Name="BtnGetText" Content="Получить текст" Click="BtnGetText_Click" Margin="5, 0"/>
+            <Button x:Name="BtnSetText" Content="Задать текст" Click="BtnSetText_Click" Margin="5, 0"/>
+        </StackPanel>
     </Grid>
 </Window>

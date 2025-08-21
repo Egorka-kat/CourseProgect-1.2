@@ -7,6 +7,8 @@
         xmlns:vm="clr-namespace:CourseProgect_1._2.ViewModels"
         xmlns:mod="clr-namespace:CourseProgect_1._2.models"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        
         Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="EditWindow" Height="450" Width="800">
@@ -39,7 +41,18 @@
                         <ContextMenu x:Key="ItemContextMenu">
                             <MenuItem Header="Открыть" 
                       Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                      CommandParameter="{Binding}"/>
+                      CommandParameter="{Binding}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
                             <MenuItem Header="Пеоеименовать" 
 Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
 CommandParameter="{Binding}"/>
@@ -78,7 +91,62 @@ CommandParameter="{Binding}"/>
                     Width="4"
                     Background="LightGray"
                     />
-                <TabControl Grid.Column="1" VerticalAlignment="Top" Margin="5"/>
+                <TabControl ItemsSource="{Binding TabItems}"
+                            SelectedIndex="{Binding SelectedTabIndex}"
+                            Grid.Column="1" >
+                    <TabControl.Resources>
+                        <Style x:Key="CloseButtonStyle" TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Grid>
+                                            <Ellipse Name="BG"/>
+                                            <Path Name="PATH" Stroke="Gray" StrokeThickness="2" Stretch="Fill"
+         Data="M 0 0 M 0.3 0.3 L 0.7 0.7 M 0.3 0.7 L 0.7 0.3 M 1 1"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="BG" Property="Fill" Value="#DB4437"/>
+                                                <Setter TargetName="PATH" Property="Stroke" Value="White"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="BG" Property="Fill" Value="#A8352A"/>
+                                                <Setter TargetName="PATH" Property="Stroke" Value="White"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel HorizontalAlignment="Stretch">
+                                <TextBlock Text="{Binding TitleName}" 
+                           VerticalAlignment="Center"
+                           Margin="0,0,5,0"/>
+                                <Button Height="15" Width="15" HorizontalAlignment="Center" Style="{StaticResource CloseButtonStyle}"
+                        Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                        CommandParameter="{Binding}">
+                                </Button>
+                            </DockPanel>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <avalonEdit:TextEditor 
+                                Document="{Binding Document}"
+                                Grid.Row="0"
+                                SyntaxHighlighting="HTML"
+                                FontFamily="Consolas"
+                                FontSize="12pt"
+                                ShowLineNumbers="True"
+                                WordWrap="False">
+                            </avalonEdit:TextEditor>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
             </Grid>
         </DockPanel>
     </DockPanel>

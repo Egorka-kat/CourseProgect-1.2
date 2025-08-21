@@ -5,9 +5,5 @@
              xmlns:mod="clr-namespace:Test.models"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.WPF;component/#FontAwesome</FontFamily>
-
-        <!-- Конвертер иконок -->
-        <mod:IconConverter x:Key="IconConverter"/>
     </Application.Resources>
 </Application>

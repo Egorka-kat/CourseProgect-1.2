@@ -5,6 +5,7 @@ using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
 using CourseProgect_1._2.Views.Windows;
 using FontAwesome.WPF;
+using ICSharpCode.AvalonEdit;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,6 +26,16 @@ namespace CourseProgect_1._2.ViewModels
     class EW_ViewModel : ViewModel
     {
         public ObservableCollection<FileSystemItem> FileSystemItems { get; set; } = new ObservableCollection<FileSystemItem>();
+        public ObservableCollection<TabSystemItem> TabItems { get; set; } = new ObservableCollection<TabSystemItem> 
+        {  };
+        private TabSystemItem _ActiveaTabSystemItem;
+        public TabSystemItem ActiveaTabSystemItem
+        {
+            get => _ActiveaTabSystemItem;
+            set => Set(ref _ActiveaTabSystemItem, value);
+        
+        }
+        
 
         private GridLength _ColumnWigth = new GridLength(200);
         public GridLength ColumnWigth
@@ -50,59 +61,79 @@ namespace CourseProgect_1._2.ViewModels
                 LoadDirectory(_LoadPath);
             }
         }
+        private int _selectedTabIndex;
+        public int SelectedTabIndex
+        {
+            get => _selectedTabIndex;
+            set
+            {
+                Set(ref _selectedTabIndex, value);
+            }
+        }
         public void LoadDirectory(string path)
         {
+            FileSystemItems.Clear();
+
             var directoryInfo = new DirectoryInfo(path);
 
-            foreach (var dir in directoryInfo.GetDirectories())
+            // Создаем корневой узел
+            var rootItem = new FileSystemItem
             {
-                var item = new FileSystemItem
-                {
-                    Name = dir.Name,
-                    FullPath = dir.FullName,
-                    IsDirectory = true
-                };
-                FileSystemItems.Add(item);
-                LoadSubdirectories(item); // Рекурсивная загрузка вложенных папок
-            }
+                Name = directoryInfo.Name,
+                FullPath = directoryInfo.FullName,
+                IsDirectory = true,
+                Children = new ObservableCollection<FileSystemItem>()
+            };
 
-            foreach (var file in directoryInfo.GetFiles())
-            {
-                FileSystemItems.Add(new FileSystemItem
-                {
-                    Name = file.Name,
-                    FullPath = file.FullName,
-                    IsDirectory = false
-                });
-            }
+            FileSystemItems.Add(rootItem);
+
+            // Загружаем содержимое корневой папки
+            LoadSubdirectories(rootItem);
         }
+
         private void LoadSubdirectories(FileSystemItem parentItem)
         {
-            var directoryInfo = new DirectoryInfo(parentItem.FullPath);
-
-            foreach (var dir in directoryInfo.GetDirectories())
+            try
             {
-                var item = new FileSystemItem
+                var directoryInfo = new DirectoryInfo(parentItem.FullPath);
+
+                // Загрузка подпапок
+                foreach (var dir in directoryInfo.GetDirectories())
                 {
-                    Name = dir.Name,
-                    FullPath = dir.FullName,
-                    IsDirectory = true
-                };
-                parentItem.Children.Add(item);
-                LoadSubdirectories(item); // Рекурсивно добавляем вложенные элементы
+                    var item = new FileSystemItem
+                    {
+                        Name = dir.Name,
+                        FullPath = dir.FullName,
+                        IsDirectory = true,
+                        Children = new ObservableCollection<FileSystemItem>()
+                    };
+
+                    parentItem.Children.Add(item);
+
+                    // Рекурсивно загружаем вложенные папки (по необходимости)
+                    // LoadSubdirectories(item);
+                }
+
+                // Загрузка файлов
+                foreach (var file in directoryInfo.GetFiles())
+                {
+                    parentItem.Children.Add(new FileSystemItem
+                    {
+                        Name = file.Name,
+                        FullPath = file.FullName,
+                        IsDirectory = false
+                    });
+                }
             }
-
-            foreach (var file in directoryInfo.GetFiles())
+            catch (UnauthorizedAccessException)
             {
-                parentItem.Children.Add(new FileSystemItem
-                {
-                    Name = file.Name,
-                    FullPath = file.FullName,
-                    IsDirectory = false
-                });
+                // Обработка отсутствия прав доступа
+            }
+            catch (DirectoryNotFoundException)
+            {
+                // Обработка отсутствия директории
             }
         }
-
 
         #region ClosingTreeView
         private bool _isPanelClosed = false;
@@ -142,6 +173,16 @@ namespace CourseProgect_1._2.ViewModels
         #endregion
 
         #region DeleteCommand
+        private bool DeleteFileSystemItemInOC(FileSystemItem item, ObservableCollection<FileSystemItem> _FileSystemItems)
+        {
+            if (_FileSystemItems.Contains(item))  { item.Children.Clear(); ; _FileSystemItems.Remove(item); return true; }
+
+            foreach (FileSystemItem item1 in _FileSystemItems) 
+            {
+                DeleteFileSystemItemInOC(item,item1.Children);
+            }
+            return false;
+        }
         public ICommand? DeleteCommand { get; set; }
         private bool CanDeleteCommandExecuted(object par) => true;
         public async void OnDeleteCommandExecuted(object par)
@@ -163,10 +204,15 @@ namespace CourseProgect_1._2.ViewModels
                 if (item.IsDirectory)
                 {
                     Directory.Delete(item.FullPath, true);
+                    if(DeleteFileSystemItemInOC(item, FileSystemItems))
+                        return;
                 }
                 else
                 {
                     File.Delete(item.FullPath);
+                    DeleteTabItem(item.FullPath);
+                    if (DeleteFileSystemItemInOC(item, FileSystemItems))
+                        return;
                 }
 
                 // Удаляем элемент из родительской коллекции в UI потоке
@@ -195,6 +241,24 @@ namespace CourseProgect_1._2.ViewModels
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        private void DeleteTabItem(string path)
+        {
+            try
+            {
+
+                foreach (var item in TabItems)
+                {
+                    if (item.Path == path)
+                    {
+                        TabItems.Remove(item);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
         #endregion
         #region RenameCommand
         public ICommand? RenameCommand { get; set; }
@@ -221,6 +285,7 @@ namespace CourseProgect_1._2.ViewModels
 
                 string directoryPath = System.IO.Path.GetDirectoryName(item.FullPath)!;
                 string newFullPath = System.IO.Path.Combine(directoryPath, newName);
+                string OldPath = item.FullPath;
 
                 // Проверка на существование
                 bool exists = await Task.Run(() => item.IsDirectory ?
@@ -243,6 +308,7 @@ namespace CourseProgect_1._2.ViewModels
                     else
                     {
                         File.Move(item.FullPath, newFullPath);
+                        RenameNameAndPathTabItem(OldPath, newFullPath);
                         item.Name = System.IO.Path.GetFileName(newFullPath);
                     }
                 });
@@ -262,6 +328,24 @@ namespace CourseProgect_1._2.ViewModels
             {
                 MessageBox.Show($"Ошибка при переименовании: {ex.Message}", "Ошибка",
                                MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void RenameNameAndPathTabItem(string OldPath, string NewPath)
+        {
+            try
+            {
+                foreach (var item in TabItems)
+                {
+                    if (item.Path == OldPath)
+                    {
+                        item.TitleName = System.IO.Path.GetFileName(NewPath);
+                        item.Path = NewPath;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
             }
         }
         private void RefreshTreeView()
@@ -369,6 +453,36 @@ namespace CourseProgect_1._2.ViewModels
             }
         }
         #endregion
+
+        #region OpenCommand
+        public ICommand? OpenCommand { get; set; }
+        private bool CanOpenCommandExecuted(object par) => true;
+        public void OnOpenCommandExecuted(object par)
+        {
+            if (par is not FileSystemItem item) return;
+
+            try
+            {
+                TabSystemItem tabSystemItem = new TabSystemItem(item.Name,item.FullPath);
+                TabItems.Add(tabSystemItem);
+                SelectedTabIndex = TabItems.IndexOf(tabSystemItem);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+        #endregion
+        #region CloseTabCommand
+        public ICommand? CloseTabCommand { get; set; }
+        private bool CanCloseTabCommandExecuted(object par) => true;
+        public void OnCloseTabCommandExecuted(object par)
+        {
+            if (par is not TabSystemItem item) return;
+            TabItems.Remove(item);
+        }
+        #endregion
+
         private void RemoveItemFromTree(FileSystemItem itemToDelete)
         {
             // Ищем родительский элемент в корневых элементах
@@ -429,6 +543,8 @@ namespace CourseProgect_1._2.ViewModels
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
             DeleteCommand = new LambdaCommand(OnDeleteCommandExecuted, CanDeleteCommandExecuted);
             RenameCommand = new LambdaCommand(OnRenameCommandExecuted, CanRenameCommandExecuted);
+            OpenCommand = new LambdaCommand(OnOpenCommandExecuted, CanOpenCommandExecuted);
+            CloseTabCommand = new LambdaCommand(OnCloseTabCommandExecuted, CanCloseTabCommandExecuted);
         }
     }
 }
