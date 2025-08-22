@@ -24,7 +24,6 @@ namespace Test
             {
                 // Инициализация WebView2
                 await webView.EnsureCoreWebView2Async(null);
-
                 // Настройка дополнительных параметров после инициализации
                 if (webView.CoreWebView2 != null)
                 {

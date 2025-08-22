@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Markdig;
+using Markdig.Wpf;
 
 namespace CourseProgect_1._2.models
 {
@@ -31,6 +33,18 @@ namespace CourseProgect_1._2.models
                 try
                 {
                     string s = new Uri(Path).AbsoluteUri;
+                    if (System.IO.Path.GetExtension(Path).ToLower() == ".md")
+                    {
+                        var html_defaul = "<html>\r\n    <head>\r\n    <head>\r\n<meta charset=\"UTF-8\">\r\n</head>     </head>\r\n    <body>";
+                        html_defaul += Text;
+                        html_defaul += Markdig.Markdown.ToHtml(html_defaul);
+                        html_defaul += "</body>\r\n</html>";
+                        Document.Text = html_defaul;
+                        string htmlContent = "<h1>Data URL Example</h1><p>This is loaded via data URL</p>";
+                        string base64Content = Convert.ToBase64String(Encoding.UTF8.GetBytes(Document.Text));
+                        string dataUrl = $"data:text/html;base64,{base64Content}";
+                        return new Uri(dataUrl);
+                    }
                     return new Uri(s);
                 }
                 catch
@@ -59,8 +73,7 @@ namespace CourseProgect_1._2.models
                 {
                     // Обновляем документ только если текст действительно изменился
                     if (Document.Text != value)
-                    {
-                        Document.Text = value;
+                    {                        Document.Text = value;
                     }
                 }
             }
@@ -87,9 +100,9 @@ namespace CourseProgect_1._2.models
                 ".sql" => HighlightingManager.Instance.GetDefinition("SQL"),
                 ".css" => HighlightingManager.Instance.GetDefinition("CSS"),
                 ".py" => HighlightingManager.Instance.GetDefinition("Python"),
+                ".md" => HighlightingManager.Instance.GetDefinition("HTML"),
                 _ => null
             };
-
             OnPropertyChanged(nameof(SyntaxHighlighting));
         }
 

@@ -2,11 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:CourseProgect_1._2"
+             xmlns:con="clr-namespace:CourseProgect_1._2.infrastructure.Converter"
              xmlns:mod="clr-namespace:CourseProgect_1._2.models"
              StartupUri="views/Windows/MainWindow.xaml">
     <Application.Resources>
         <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.WPF;component/#FontAwesome</FontFamily>
-
+        <con:OpenCommandConverter x:Key="OpenCommandConverter"/>
         <!-- Конвертер иконок -->
         <mod:IconConverter x:Key="IconConverter"/>
 
@@ -231,5 +232,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
     </Application.Resources>
 </Application>

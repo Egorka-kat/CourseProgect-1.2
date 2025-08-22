@@ -35,18 +35,7 @@ namespace CourseProgect_1._2.ViewModels
             set 
             {
                 Set(ref _ActiveaTabSystemItem, value);
-                if (value is TabSystemItem tabItem)
-                {
-                    TabOpenedCommand?.Execute(tabItem.UriPath);
-                }
             }
-        }
-        public ICommand? TabOpenedCommand { get; set; }
-        private bool CaTabOpenedCommandExecuted(object par) => true;
-        public void OTabOpenedCommandExecuted(object par)
-        {
-            if (par is not Uri item) return;
-            
         }
 
         private GridLength _ColumnWigth = new GridLength(200);
@@ -475,7 +464,14 @@ namespace CourseProgect_1._2.ViewModels
 
             try
             {
-                TabSystemItem tabSystemItem = new TabSystemItem(item.Name,item.FullPath);
+                TabSystemItem tabSystemItem = new TabSystemItem(item.Name, item.FullPath);
+                if (CheckingOnOpenCommand(tabSystemItem))
+                {
+                    SelectedTabIndex = TabItems.IndexOf(GetTabSystemItemToPath(tabSystemItem));
+                    return;
+                }
+
+                tabSystemItem.isSave = false;
                 TabItems.Add(tabSystemItem);
                 SelectedTabIndex = TabItems.IndexOf(tabSystemItem);
             }
@@ -483,6 +479,28 @@ namespace CourseProgect_1._2.ViewModels
             {
 
             }
+        }
+        private TabSystemItem GetTabSystemItemToPath(TabSystemItem tabSystemItem)
+        {
+            foreach (var item in TabItems)
+            {
+                if (item.Path == tabSystemItem.Path)
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
+        private bool CheckingOnOpenCommand(TabSystemItem item)
+        {
+            foreach (var item1 in TabItems)
+            {
+                if (item1.Path == item.Path)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         #endregion
         #region CloseTabCommand

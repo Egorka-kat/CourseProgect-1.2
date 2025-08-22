@@ -1,4 +1,5 @@
-﻿using CourseProgect_1._2.ViewModels;
+﻿using CourseProgect_1._2.models;
+using CourseProgect_1._2.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,5 +61,17 @@ namespace CourseProgect_1._2.Views.Windows
             }
         }
 
+        private void StackPanel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2 && sender is Border border &&
+        border.Tag is FileSystemItem item &&
+        !item.IsDirectory &&
+        DataContext is EW_ViewModel viewModel &&
+        viewModel.OpenCommand?.CanExecute(item) == true)
+            {
+                viewModel.OpenCommand.Execute(item);
+                e.Handled = true;
+            }
+        }
     }
 }
