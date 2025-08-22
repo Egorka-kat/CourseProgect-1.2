@@ -14,9 +14,32 @@ namespace CourseProgect_1._2.models
         private string _TitleName;
         public string TitleName { get => _TitleName; set => Set(ref _TitleName, value); }
         private string _Path;
-        public string Path { get => _Path;
-            set { Set(ref _Path, value); UpdateSyntaxHighlightingFromExtension(); } 
+        public string Path
+        {
+            get => _Path;
+            set { 
+                Set(ref _Path, value);
+                UpdateSyntaxHighlightingFromExtension();
+                OnPropertyChanged(nameof(UriPath)); 
+            }
         }
+        public Uri UriPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Path)) return null;
+                try
+                {
+                    string s = new Uri(Path).AbsoluteUri;
+                    return new Uri(s);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
+
         private TextDocument _document;
         public TextDocument Document
         {

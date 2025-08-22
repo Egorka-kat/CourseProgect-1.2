@@ -8,7 +8,7 @@
         xmlns:mod="clr-namespace:CourseProgect_1._2.models"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-        
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="EditWindow" Height="450" Width="800">
@@ -33,8 +33,8 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition x:Name="Col1" Width="38*" MaxWidth="350"/>
-                    <ColumnDefinition Width="127*"/>
-                    <ColumnDefinition Width="35*" MaxWidth="350"/>
+                    <ColumnDefinition Width="127*" MinWidth="40"/>
+                    <ColumnDefinition Width="35*" />
                 </Grid.ColumnDefinitions>
                 <TreeView Margin="6" ItemsSource="{Binding FileSystemItems}">
                     <TreeView.Resources>
@@ -93,6 +93,7 @@ CommandParameter="{Binding}"/>
                     />
                 <TabControl ItemsSource="{Binding TabItems}"
                             SelectedIndex="{Binding SelectedTabIndex}"
+                            SelectedItem="{Binding ActiveaTabSystemItem, Mode=Default}"
                             Grid.Column="1" >
                     <TabControl.Resources>
                         <Style x:Key="CloseButtonStyle" TargetType="Button">
@@ -147,6 +148,7 @@ CommandParameter="{Binding}"/>
                         </DataTemplate>
                     </TabControl.ContentTemplate>
                 </TabControl>
+                <wv2:WebView2 x:Name="webView" Grid.Column="2" Margin="5" DataContext="{Binding ActiveaTabSystemItem}"  Source="{Binding UriPath}" HorizontalAlignment="Stretch"  />
             </Grid>
         </DockPanel>
     </DockPanel>

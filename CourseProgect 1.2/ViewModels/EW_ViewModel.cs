@@ -32,10 +32,22 @@ namespace CourseProgect_1._2.ViewModels
         public TabSystemItem ActiveaTabSystemItem
         {
             get => _ActiveaTabSystemItem;
-            set => Set(ref _ActiveaTabSystemItem, value);
-        
+            set 
+            {
+                Set(ref _ActiveaTabSystemItem, value);
+                if (value is TabSystemItem tabItem)
+                {
+                    TabOpenedCommand?.Execute(tabItem.UriPath);
+                }
+            }
         }
-        
+        public ICommand? TabOpenedCommand { get; set; }
+        private bool CaTabOpenedCommandExecuted(object par) => true;
+        public void OTabOpenedCommandExecuted(object par)
+        {
+            if (par is not Uri item) return;
+            
+        }
 
         private GridLength _ColumnWigth = new GridLength(200);
         public GridLength ColumnWigth

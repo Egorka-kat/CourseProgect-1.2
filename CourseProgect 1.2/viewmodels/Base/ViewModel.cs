@@ -8,8 +8,14 @@ namespace CourseProgect_1._2.ViewModels.Base
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string PropertyName = "") 
-        { 
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+        {
+            try
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+            }
+            catch (Exception)
+            {
+            }
         }
 
         protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string PropertyName = "")
