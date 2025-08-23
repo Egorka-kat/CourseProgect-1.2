@@ -1,10 +1,7 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.ViewModels.Base;
 using Microsoft.Win32;
-using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace CourseProgect_1._2.viewmodels

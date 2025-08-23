@@ -1,25 +1,13 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.models;
-using CourseProgect_1._2.Models;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
-using CourseProgect_1._2.Views.Windows;
 using FontAwesome.WPF;
-using ICSharpCode.AvalonEdit;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace CourseProgect_1._2.ViewModels
 {
@@ -27,8 +15,10 @@ namespace CourseProgect_1._2.ViewModels
     {
         public ObservableCollection<FileSystemItem> FileSystemItems { get; set; } = new ObservableCollection<FileSystemItem>();
         public ObservableCollection<TabSystemItem> TabItems { get; set; } = new ObservableCollection<TabSystemItem> 
-        {  };
+        { };
         private TabSystemItem _ActiveaTabSystemItem;
+
+        public bool isClosed = true;
         public TabSystemItem ActiveaTabSystemItem
         {
             get => _ActiveaTabSystemItem;
@@ -172,6 +162,44 @@ namespace CourseProgect_1._2.ViewModels
             }
         }
         #endregion
+        #region ClosingWebView
+        private bool _isWebViewClosed = false;
+        public bool IsWebViewClosed
+        {
+            get => _isWebViewClosed;
+            set
+            {
+                _isWebViewClosed = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(PanelIconWebView));
+            }
+        }
+
+        public FontAwesomeIcon PanelIconWebView =>
+            IsWebViewClosed ? FontAwesomeIcon.AngleDoubleRight : FontAwesomeIcon.AngleDoubleLeft;
+        public ICommand? ClosingWebView { get; set; }
+        private bool CanClosingWebViewExecuted(object par) => true;
+
+        private GridLength FixedWidthWebView;
+        public void OnClosingWebViewExecuted(object par)
+        {
+            if (!Equals(par))
+            {
+                ColumnDefinition COL = par as ColumnDefinition;
+                if (!IsPanelClosed)
+                {
+                    FixedWidthWebView = COL.Width;
+                    COL.Width = new GridLength(0);
+                    IsPanelClosed = true;
+                }
+                else
+                {
+                    COL.Width = FixedWidthWebView;
+                    IsPanelClosed = false;
+                }
+            }
+        }
+        #endregion
 
         #region DeleteCommand
         private bool DeleteFileSystemItemInOC(FileSystemItem item, ObservableCollection<FileSystemItem> _FileSystemItems)
@@ -217,7 +245,7 @@ namespace CourseProgect_1._2.ViewModels
                 }
 
                 // Удаляем элемент из родительской коллекции в UI потоке
-                await Application.Current.Dispatcher.InvokeAsync(() =>
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     RemoveItemFromTree(item);
                 });
@@ -273,7 +301,7 @@ namespace CourseProgect_1._2.ViewModels
             try
             {
                 // Используем VisualBasic InputBox
-                string newName = await Application.Current.Dispatcher.InvokeAsync(() =>
+                string newName = await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     return Microsoft.VisualBasic.Interaction.InputBox(
                         "Введите новое имя:",
@@ -315,7 +343,7 @@ namespace CourseProgect_1._2.ViewModels
                 });
 
                 //Обновление TreeView
-                await Application.Current.Dispatcher.InvokeAsync(() =>
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     item.Name = newName;
                     item.FullPath = newFullPath;
@@ -471,7 +499,6 @@ namespace CourseProgect_1._2.ViewModels
                     return;
                 }
 
-                tabSystemItem.isSave = false;
                 TabItems.Add(tabSystemItem);
                 SelectedTabIndex = TabItems.IndexOf(tabSystemItem);
             }
@@ -503,16 +530,71 @@ namespace CourseProgect_1._2.ViewModels
             return false;
         }
         #endregion
+        public ICommand? SaveToClosed { get; set; }
+        private bool CanSaveToClosedExecuted(object par) => true;
+        public void OnSaveToClosedExecuted(object par)
+        {
+            ObservableCollection<TabSystemItem> SaveItem = new ObservableCollection<TabSystemItem>();
+            foreach (var item in TabItems)
+            {
+                if (item.isSave == false)
+                {
+                    SaveItem.Add(item);
+                }
+            }
+            SaveTheAllFile saveTheAllFile = new SaveTheAllFile(SaveItem);
+            saveTheAllFile.ShowDialog();
+            if (saveTheAllFile.Closure == true)
+                isClosed = true;
+            else isClosed = false;
+        }
         #region CloseTabCommand
         public ICommand? CloseTabCommand { get; set; }
         private bool CanCloseTabCommandExecuted(object par) => true;
         public void OnCloseTabCommandExecuted(object par)
         {
             if (par is not TabSystemItem item) return;
+            if (item.isSave == false)
+            {
+                SaveTheAllFile saveTheAllFile = new SaveTheAllFile(item);
+                saveTheAllFile.ShowDialog();
+                if (saveTheAllFile.Closure == true)
+                    TabItems.Remove(item);
+                return;
+            }
             TabItems.Remove(item);
         }
-        #endregion
+        private void SaveInFile(TabSystemItem item)
+        {
+            try
+            {
+                if (item.isSave == false)
+                {
+                    using (StreamWriter writer = new StreamWriter(item.Path, false))
+                    {
+                        writer.WriteLine(item.Text);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
 
+                MessageBox.Show($"Ошибка при сохранении {item.TitleName}: {ex.Message}", "Ошибка",
+                               MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        #endregion
+        #region CloseProgramm
+        public ICommand? CloseProgramm { get; set; }
+        private bool CanCloseProgrammExecuted() => true;
+        public void OnCloseProgrammExecuted()
+        {
+            foreach(var item in TabItems)
+            {
+                SaveInFile(item);
+            }
+        }
+        #endregion
         private void RemoveItemFromTree(FileSystemItem itemToDelete)
         {
             // Ищем родительский элемент в корневых элементах
@@ -568,6 +650,19 @@ namespace CourseProgect_1._2.ViewModels
             return null;
         }
 
+        #region TextChangedCommand
+        public ICommand? TextChangedCommand { get; set; }
+        private bool CanTextChangedCommandExecuted(object par) => true;
+        public void OnTextChangedCommandExecuted(object par)
+        {
+            if (par is not TabSystemItem item) return;
+            item.isSave = false;
+            if (item.TitleName[item.TitleName.Length -1] != '*' && item.isSave == false)
+            {
+                item.TitleName += "*";
+            }
+        }
+        #endregion
         public EW_ViewModel()
         {
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
@@ -575,6 +670,9 @@ namespace CourseProgect_1._2.ViewModels
             RenameCommand = new LambdaCommand(OnRenameCommandExecuted, CanRenameCommandExecuted);
             OpenCommand = new LambdaCommand(OnOpenCommandExecuted, CanOpenCommandExecuted);
             CloseTabCommand = new LambdaCommand(OnCloseTabCommandExecuted, CanCloseTabCommandExecuted);
+            ClosingWebView = new LambdaCommand(OnClosingWebViewExecuted, CanClosingWebViewExecuted);
+            TextChangedCommand = new LambdaCommand(OnTextChangedCommandExecuted, CanTextChangedCommandExecuted);
+            SaveToClosed = new LambdaCommand(OnSaveToClosedExecuted, CanSaveToClosedExecuted);
         }
     }
 }

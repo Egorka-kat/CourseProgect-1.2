@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CourseProgect_1._2.Infrastructure.Commands.Base;
+﻿using CourseProgect_1._2.Infrastructure.Commands.Base;
 
 namespace CourseProgect_1._2.Infrastructure.Commands
 {

@@ -14,32 +14,14 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
-        <!-- Панель навигации -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-            <Button x:Name="BackButton" Content="← Назад" Click="BackButton_Click" Margin="5" Padding="10,2"/>
-            <Button x:Name="ForwardButton" Content="Вперед →" Click="ForwardButton_Click" Margin="5" Padding="10,2"/>
-            <Button x:Name="RefreshButton" Content="Обновить" Click="RefreshButton_Click" Margin="5" Padding="10,2"/>
-            <TextBox x:Name="UrlTextBox" Width="300" Margin="5" KeyDown="UrlTextBox_KeyDown"/>
-            <Button x:Name="GoButton" Content="Перейти" Click="GoButton_Click" Margin="5" Padding="10,2"/>
-        </StackPanel>
-
-        <!-- WebView2 контрол -->
-        <wv2:WebView2 x:Name="webView" 
-                     Grid.Row="1" 
-                     Source="https://www.google.com"
-                     NavigationStarting="WebView_NavigationStarting"
-                     NavigationCompleted="WebView_NavigationCompleted"
-                     CoreWebView2InitializationCompleted="WebView_CoreWebView2InitializationCompleted"/>
-
-        <!-- Статус бар -->
-        <StatusBar Grid.Row="2">
-            <StatusBarItem>
-                <TextBlock x:Name="StatusText" Text="Готово"/>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <ProgressBar x:Name="ProgressBar" Width="100" Height="15" IsIndeterminate="False"/>
-            </StatusBarItem>
-        </StatusBar>
+        <ListBox Name="phonesList">
+            <TextBlock FontWeight="Bold" TextDecorations="Underline" Text="Новинки 2015 года" />
+            <ListBoxItem Background="LightGray">LG Nexus 5X</ListBoxItem>
+            <ListBoxItem>Huawei Nexus 6P</ListBoxItem>
+            <ListBoxItem Background="LightGray">iPhone 6S</ListBoxItem>
+            <ListBoxItem>iPhone 6S Plus</ListBoxItem>
+            <ListBoxItem Background="LightGray">Аsus Zenphone 2</ListBoxItem>
+            <ListBoxItem>Microsoft Lumia 950</ListBoxItem>
+        </ListBox>
     </Grid>
 </Window>

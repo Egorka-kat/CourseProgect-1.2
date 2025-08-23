@@ -1,18 +1,10 @@
 ﻿using CourseProgect_1._2.models;
 using CourseProgect_1._2.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ICSharpCode.AvalonEdit;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CourseProgect_1._2.Views.Windows
 {
@@ -22,9 +14,12 @@ namespace CourseProgect_1._2.Views.Windows
     public partial class EditWindow : Window
     {
         private readonly string _PathParameter;
+        internal EW_ViewModel ViewModel => (EW_ViewModel)DataContext;
+
         public EditWindow(string path)
         {
             _PathParameter = path;
+            DataContext = new EW_ViewModel();
             InitializeComponent();
         }
 
@@ -72,6 +67,26 @@ namespace CourseProgect_1._2.Views.Windows
                 viewModel.OpenCommand.Execute(item);
                 e.Handled = true;
             }
+        }
+
+        private void TextEditor_TextChanged(object sender, EventArgs e)
+        {
+            var editor = (TextEditor)sender;
+
+            if (ViewModel.TextChangedCommand.CanExecute(editor.Tag))
+            {
+                ViewModel.TextChangedCommand.Execute(editor.Tag);
+            }
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            ViewModel.SaveToClosed.Execute(true);
+            if (ViewModel.isClosed == false)
+            {
+                e.Cancel = true;
+            }
+            
         }
     }
 }

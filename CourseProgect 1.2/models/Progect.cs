@@ -1,13 +1,5 @@
 ﻿using CourseProgect_1._2.ViewModels.Base;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CourseProgect_1._2.Models
 {
