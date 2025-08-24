@@ -1,0 +1,31 @@
+﻿<Window x:Class="CourseProgect_1._2.views.Windows.ToCreateDirectoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CourseProgect_1._2.views.Windows"
+        mc:Ignorable="d"
+        Title="ToCreateDirectoryWindow" Height="140" Width="300" ResizeMode="NoResize" WindowStyle="SingleBorderWindow">
+    <Grid>
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="0,10,0,0">
+            <TextBlock Text="Имя папки:" 
+                           DockPanel.Dock="Left" 
+                           VerticalAlignment="Center"
+                           Margin="5,0,5,0"/>
+
+            <TextBox Text="{Binding NameDirectory, UpdateSourceTrigger=PropertyChanged}"
+           Margin="0,10,15,10"/>
+        </DockPanel>
+            <Grid DockPanel.Dock="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" Content="Отмена" Margin="20,15,10,15" Click="Calcer_Buttom"/>
+                <Button Grid.Column="2" Content="Создать" Margin="10,15,5,15" Click="Save_Button"/>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>

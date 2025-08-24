@@ -62,5 +62,23 @@ namespace CourseProgect_1._2.Views.Windows
             }
             
         }
+
+        private void DockPanel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is DockPanel dockPanel && dockPanel.DataContext is TabSystemItem tabItem)
+            {
+                ViewModel.TabDragTabItem.Execute(tabItem);
+                DragDrop.DoDragDrop(dockPanel, tabItem, DragDropEffects.Copy);
+            }
+
+        }
+
+        private void DockPanel_Drop(object sender, DragEventArgs e)
+        {
+            if (sender is DockPanel dockPanel && dockPanel.DataContext is TabSystemItem tabItem)
+            {
+                ViewModel.TabDropTabItem.Execute(tabItem);
+            }
+        }
     }
 }

@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:CourseProgect_1._2.ViewModels"
         xmlns:local="clr-namespace:CourseProgect_1._2.views.Windows"
         mc:Ignorable="d"
-        Title="TextEditor" Height="245" Width="300" WindowStyle="SingleBorderWindow">
+        Title="TextEditor" Height="245" Width="300" WindowStyle="SingleBorderWindow" ResizeMode="NoResize">
     <Grid>
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">

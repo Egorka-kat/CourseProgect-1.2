@@ -16,11 +16,12 @@ namespace CourseProgect_1._2.ViewModels
 {
     class TCFW_ViewModel : ViewModel
     {
-        private FileSystemItem Directori;
+        private FileSystemItem Directory;
         private FileType _selectedFileType;
         private string _customExtension;
         private string _fileName;
-        public bool Closer;
+        private bool _Closer;
+        public bool Closer { get => _Closer; set => _Closer = value; }
         public FileType SelectedFileType
         {
             get => _selectedFileType;
@@ -76,14 +77,14 @@ namespace CourseProgect_1._2.ViewModels
             // Логика создания файла
             var extension = GetCurrentExtension();
             var fullName = $"{FileName}{extension}";
-            string PathNewFile = Directori.FullPath + "\\" + fullName;
+            string PathNewFile = Directory.FullPath + "\\" + fullName;
             Closer = true;
             if (CanCreateFile())
             {
                 if (!File.Exists(PathNewFile))
                 {
                     File.Create(PathNewFile);
-                    Directori.Children.Add(
+                    Directory.Children.Add(
                         new FileSystemItem
                         {
                             Name = fullName,
@@ -101,7 +102,7 @@ namespace CourseProgect_1._2.ViewModels
 
         public TCFW_ViewModel(FileSystemItem item)
         {
-            Directori = item;
+            Directory = item;
 
             FileTypes = new ObservableCollection<FileType>
             {

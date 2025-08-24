@@ -19,6 +19,8 @@ namespace CourseProgect_1._2.ViewModels
         { };
         private TabSystemItem _ActiveaTabSystemItem;
 
+        private TabSystemItem DragTabItem;
+
         public bool isClosed = true;
         public TabSystemItem ActiveaTabSystemItem
         {
@@ -721,6 +723,38 @@ namespace CourseProgect_1._2.ViewModels
             window.ShowDialog();
         }
         #endregion
+        #region ToСreateDirectoryCommand
+        public ICommand? ToСreateDirectoryCommand { get; set; }
+        private bool CanToСreateDirectoryCommandExecuted(object par) => true;
+        public void OnToСreateDirectoryCommandExecuted(object par)
+        {
+            if (par is not FileSystemItem item) return;
+
+            ToCreateDirectoryWindow window = new ToCreateDirectoryWindow(item);
+            window.ShowDialog();
+        }
+        #endregion
+        #region TabDragTabItem
+        public ICommand? TabDragTabItem { get; set; }
+        private bool CanTabDragTabItemExecuted(object par) => true;
+        public void OnTabDragTabItemExecuted(object par)
+        {
+            if (par is not TabSystemItem item) return;
+            DragTabItem = item;
+        }
+        #endregion
+        #region TabDropTabItem
+        public ICommand? TabDropTabItem { get; set; }
+        private bool CanTabDropTabItemExecuted(object par) => true;
+        public void OnTabDropTabItemExecuted(object par)
+        {
+            if (par is not TabSystemItem item) return;
+            int indexFirst  = TabItems.IndexOf(DragTabItem);
+            int indexSecond = TabItems.IndexOf(item);
+            TabItems.Move(indexFirst, indexSecond);
+            SelectedTabIndex = indexSecond;
+        }
+        #endregion
         public EW_ViewModel()
         {
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
@@ -734,7 +768,10 @@ namespace CourseProgect_1._2.ViewModels
             SaveAllCommand = new LambdaCommand(OnSaveAllCommandExecuted, CanTSaveAllCommandExecuted);
             SaveActiveaTabItemCommand = new LambdaCommand(OnSaveActiveaTabItemCommandExecuted,CanTSaveActiveaTabItemCommandExecuted);
             OpenMainWindowCommand = new LambdaCommand(OnOpenMainWindowCommandExecuted, CanOpenMainWindowCommandExecuted);
-            ToСreateFileCommand = new LambdaCommand(OnToСreateFileCommandExecuted, CanToСreateFileCommandExecuted); 
+            ToСreateFileCommand = new LambdaCommand(OnToСreateFileCommandExecuted, CanToСreateFileCommandExecuted);
+            ToСreateDirectoryCommand = new LambdaCommand(OnToСreateDirectoryCommandExecuted, CanToСreateDirectoryCommandExecuted);
+            TabDragTabItem = new LambdaCommand(OnTabDragTabItemExecuted, CanTabDragTabItemExecuted);
+            TabDropTabItem = new LambdaCommand(OnTabDropTabItemExecuted, CanTabDropTabItemExecuted);
         }
     }
 }

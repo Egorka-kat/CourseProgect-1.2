@@ -83,8 +83,22 @@
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
-                            <MenuItem Header="Создавать файл" 
+                            <MenuItem Header="Создать файл" 
 Command="{Binding DataContext.ToСreateFileCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+CommandParameter="{Binding}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDirectory}" Value="false">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
+                            <MenuItem Header="Создать папку" 
+Command="{Binding DataContext.ToСreateDirectoryCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
 CommandParameter="{Binding}">
                                 <MenuItem.Style>
                                     <Style TargetType="MenuItem">
@@ -187,7 +201,10 @@ CommandParameter="{Binding}"/>
 
                     <TabControl.ItemTemplate>
                         <DataTemplate>
-                            <DockPanel HorizontalAlignment="Stretch">
+                            <DockPanel HorizontalAlignment="Stretch"
+                                       MouseDown="DockPanel_MouseDown" 
+                                       AllowDrop="True"
+                                       Drop="DockPanel_Drop">
                                 <TextBlock Text="{Binding TitleName}" 
                            VerticalAlignment="Center"
                            Margin="0,0,5,0"/>
