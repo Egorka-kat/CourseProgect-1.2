@@ -710,6 +710,17 @@ namespace CourseProgect_1._2.ViewModels
             mainWindow.Show();
         }
         #endregion
+        #region ToСreateFileCommand
+        public ICommand? ToСreateFileCommand { get; set; }
+        private bool CanToСreateFileCommandExecuted(object par) => true;
+        public void OnToСreateFileCommandExecuted(object par)
+        {
+            if (par is not FileSystemItem item) return;
+
+            ToCreateFileWindow window = new ToCreateFileWindow(item);
+            window.ShowDialog();
+        }
+        #endregion
         public EW_ViewModel()
         {
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
@@ -723,6 +734,7 @@ namespace CourseProgect_1._2.ViewModels
             SaveAllCommand = new LambdaCommand(OnSaveAllCommandExecuted, CanTSaveAllCommandExecuted);
             SaveActiveaTabItemCommand = new LambdaCommand(OnSaveActiveaTabItemCommandExecuted,CanTSaveActiveaTabItemCommandExecuted);
             OpenMainWindowCommand = new LambdaCommand(OnOpenMainWindowCommandExecuted, CanOpenMainWindowCommandExecuted);
+            ToСreateFileCommand = new LambdaCommand(OnToСreateFileCommandExecuted, CanToСreateFileCommandExecuted); 
         }
     }
 }

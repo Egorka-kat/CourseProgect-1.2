@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:CourseProgect_1._2"
              xmlns:con="clr-namespace:CourseProgect_1._2.infrastructure.Converter"
+            xmlns:ser="clr-namespace:CourseProgect_1._2.services"
              xmlns:mod="clr-namespace:CourseProgect_1._2.models"
              StartupUri="views/Windows/MainWindow.xaml">
     <Application.Resources>
@@ -10,7 +11,9 @@
         <con:OpenCommandConverter x:Key="OpenCommandConverter"/>
         <!-- Конвертер иконок -->
         <mod:IconConverter x:Key="IconConverter"/>
-
+        <ser:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
+        
+        
         <Style TargetType="Button" x:Key="BTND">
             <Setter Property="Background" Value="#B4B4B4"/>
             <Setter Property="Foreground" Value="Black"/>

@@ -1,0 +1,152 @@
+﻿using CourseProgect_1._2.Infrastructure.Commands;
+using CourseProgect_1._2.models;
+using CourseProgect_1._2.ViewModels.Base;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Input;
+
+namespace CourseProgect_1._2.ViewModels
+{
+    class TCFW_ViewModel : ViewModel
+    {
+        private FileSystemItem Directori;
+        private FileType _selectedFileType;
+        private string _customExtension;
+        private string _fileName;
+        public bool Closer;
+        public FileType SelectedFileType
+        {
+            get => _selectedFileType;
+            set
+            {
+                _selectedFileType = value;
+                OnPropertyChanged(nameof(SelectedFileType));
+                OnPropertyChanged(nameof(IsCustomExtensionEnabled));
+                UpdateExtension();
+            }
+        }
+
+        public string CustomExtension
+        {
+            get => _customExtension;
+            set
+            {
+                Set(ref _customExtension, value);
+                OnPropertyChanged(nameof(IsExtensionValid));
+            }
+        }
+        public bool IsExtensionValid => IsValidExtension(CustomExtension) || string.IsNullOrEmpty(CustomExtension);
+
+        // И затем проверять при сохранении
+        public bool CanCreateFile()
+        {
+            return !string.IsNullOrWhiteSpace(FileName) &&
+                   IsExtensionValid && FileName != null;
+        }
+
+        public string FileName
+        {
+            get => _fileName;
+            set
+            {
+                _fileName = value;
+                OnPropertyChanged(nameof(FileName));
+                OnPropertyChanged(nameof(FullFileName));
+            }
+        }
+
+        public string FullFileName => $"{FileName}{GetCurrentExtension()}";
+
+        public bool IsCustomExtensionEnabled => SelectedFileType == FileType.Custom;
+
+        public ObservableCollection<FileType> FileTypes { get; }
+
+        public ICommand CreateCommand { get; }
+        private bool CanCreateFile(object par) => !string.IsNullOrWhiteSpace(FileName) &&
+                   IsValidExtension(GetCurrentExtension());
+        private void CreateFile(object par)
+        {
+            // Логика создания файла
+            var extension = GetCurrentExtension();
+            var fullName = $"{FileName}{extension}";
+            string PathNewFile = Directori.FullPath + "\\" + fullName;
+            Closer = true;
+            if (CanCreateFile())
+            {
+                if (!File.Exists(PathNewFile))
+                {
+                    File.Create(PathNewFile);
+                    Directori.Children.Add(
+                        new FileSystemItem
+                        {
+                            Name = fullName,
+                            FullPath = PathNewFile,
+                            IsDirectory = false
+                        }
+                    );
+                    return;
+                }
+            }
+            Closer = false;
+            MessageBox.Show("Данные некорректные данные", "Ошибка создания файла",
+                      MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        public TCFW_ViewModel(FileSystemItem item)
+        {
+            Directori = item;
+
+            FileTypes = new ObservableCollection<FileType>
+            {
+                FileType.Text,
+                FileType.Markdown,
+                FileType.Html,
+                FileType.Json,
+                FileType.Xml,
+                FileType.CSharp,
+                FileType.Custom
+            };
+
+            SelectedFileType = FileType.Text;
+
+            CreateCommand = new LambdaCommand(CreateFile, CanCreateFile);
+        }
+
+        private void UpdateExtension()
+        {
+            if (SelectedFileType == FileType.Custom)
+            {
+                CustomExtension = string.Empty;
+            }
+            else
+            {
+                CustomExtension = SelectedFileType.GetExtension();
+            }
+            OnPropertyChanged(nameof(FullFileName));
+        }
+
+        private string GetCurrentExtension()
+        {
+            return SelectedFileType == FileType.Custom ? CustomExtension : SelectedFileType.GetExtension();
+        }
+
+        private bool IsValidExtension(string extension)
+        {
+            if (string.IsNullOrEmpty(extension))
+                return true;
+
+            if (!extension.StartsWith(".") || extension.Length < 2)
+                return false;
+
+            var invalidChars = System.IO.Path.GetInvalidFileNameChars();
+            return extension.Substring(1).All(c => !invalidChars.Contains(c));
+        }
+    }
+}

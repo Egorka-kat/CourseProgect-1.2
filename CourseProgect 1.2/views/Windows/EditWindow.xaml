@@ -83,6 +83,20 @@
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
+                            <MenuItem Header="Создавать файл" 
+Command="{Binding DataContext.ToСreateFileCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+CommandParameter="{Binding}">
+                                <MenuItem.Style>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDirectory}" Value="false">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
                             <MenuItem Header="Пеоеименовать" 
 Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
 CommandParameter="{Binding}"/>

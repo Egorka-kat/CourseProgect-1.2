@@ -30,32 +30,6 @@ namespace CourseProgect_1._2.Views.Windows
                 vm.LoadPath = _PathParameter;
             }
         }
-        async void InitializeAsync()
-        {
-            try
-            {
-                // Инициализация WebView2
-                await webView.EnsureCoreWebView2Async(null);
-
-                // Настройка дополнительных параметров после инициализации
-                if (webView.CoreWebView2 != null)
-                {
-                    // Включение DevTools
-                    webView.CoreWebView2.Settings.AreDevToolsEnabled = true;
-
-
-                    // Обработка ошибок навигации
-                    webView.CoreWebView2.NavigationCompleted += (sender, args) =>
-                    {
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка инициализации WebView2: {ex.Message}");
-            }
-        }
-
         private void StackPanel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2 && sender is Border border &&
