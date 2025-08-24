@@ -8,7 +8,12 @@ namespace CourseProgect_1._2.models
     class TabSystemItem : ViewModel
     {
         private string _TitleName;
-        public string TitleName { get => _TitleName; set => Set(ref _TitleName, value); }
+        public string TitleName { get => _TitleName;
+            set
+            {
+                Set(ref _TitleName, value);
+            }
+        }
         private string _Path;
         public string Path
         {

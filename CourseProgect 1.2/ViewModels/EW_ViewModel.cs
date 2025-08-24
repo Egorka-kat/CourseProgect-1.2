@@ -2,6 +2,7 @@
 using CourseProgect_1._2.models;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
+using CourseProgect_1._2.Views.Windows;
 using FontAwesome.WPF;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -535,6 +536,7 @@ namespace CourseProgect_1._2.ViewModels
         public void OnSaveToClosedExecuted(object par)
         {
             ObservableCollection<TabSystemItem> SaveItem = new ObservableCollection<TabSystemItem>();
+            
             foreach (var item in TabItems)
             {
                 if (item.isSave == false)
@@ -542,11 +544,14 @@ namespace CourseProgect_1._2.ViewModels
                     SaveItem.Add(item);
                 }
             }
-            SaveTheAllFile saveTheAllFile = new SaveTheAllFile(SaveItem);
-            saveTheAllFile.ShowDialog();
-            if (saveTheAllFile.Closure == true)
-                isClosed = true;
-            else isClosed = false;
+            if (SaveItem.Count != 0)
+            {
+                SaveTheAllFile saveTheAllFile = new SaveTheAllFile(SaveItem);
+                saveTheAllFile.ShowDialog();
+                if (saveTheAllFile.Closure == true)
+                    isClosed = true;
+                else isClosed = false;
+            }
         }
         #region CloseTabCommand
         public ICommand? CloseTabCommand { get; set; }
@@ -574,6 +579,9 @@ namespace CourseProgect_1._2.ViewModels
                     {
                         writer.WriteLine(item.Text);
                     }
+                    if (item.TitleName[item.TitleName.Length - 1] == '*') 
+                        item.TitleName = item.TitleName.Remove(item.TitleName.Length - 1);
+                    item.isSave = true;
                 }
             }
             catch (Exception ex)
@@ -656,11 +664,50 @@ namespace CourseProgect_1._2.ViewModels
         public void OnTextChangedCommandExecuted(object par)
         {
             if (par is not TabSystemItem item) return;
-            item.isSave = false;
-            if (item.TitleName[item.TitleName.Length -1] != '*' && item.isSave == false)
+            if (item.Document.Text != File.ReadAllText(item.Path) && item.isSave == true)
+            {
+                item.isSave = false;
+            }
+            if (item.TitleName[item.TitleName.Length - 1] != '*' && item.isSave == false)
             {
                 item.TitleName += "*";
             }
+        }
+        #endregion
+        #region SaveAll
+        public ICommand? SaveAllCommand { get; set; }
+        private bool CanTSaveAllCommandExecuted(object par) => true;
+        public void OnSaveAllCommandExecuted(object par)
+        {
+            if (TabItems.Count == 0) { return; }
+            foreach (var item in TabItems)
+            {
+                if (item.isSave == false)
+                {
+                    SaveInFile(item);
+                    
+                }
+            }
+        }
+        #endregion
+        #region SaveActiveaTabItemCommand
+        public ICommand? SaveActiveaTabItemCommand { get; set; }
+        private bool CanTSaveActiveaTabItemCommandExecuted(object par) => true;
+        public void OnSaveActiveaTabItemCommandExecuted(object par)
+        {
+            if (TabItems.Count == 0) { return; }
+            SaveInFile(ActiveaTabSystemItem);
+        }
+        #endregion
+        #region OpenMainWindowCommand
+        public ICommand? OpenMainWindowCommand { get; set; }
+        private bool CanOpenMainWindowCommandExecuted(object par) => true;
+        public void OnOpenMainWindowCommandExecuted(object par)
+        {
+            if (par is not EditWindow item) return;
+            MainWindow mainWindow = new MainWindow();
+            item.Close();
+            mainWindow.Show();
         }
         #endregion
         public EW_ViewModel()
@@ -673,6 +720,9 @@ namespace CourseProgect_1._2.ViewModels
             ClosingWebView = new LambdaCommand(OnClosingWebViewExecuted, CanClosingWebViewExecuted);
             TextChangedCommand = new LambdaCommand(OnTextChangedCommandExecuted, CanTextChangedCommandExecuted);
             SaveToClosed = new LambdaCommand(OnSaveToClosedExecuted, CanSaveToClosedExecuted);
+            SaveAllCommand = new LambdaCommand(OnSaveAllCommandExecuted, CanTSaveAllCommandExecuted);
+            SaveActiveaTabItemCommand = new LambdaCommand(OnSaveActiveaTabItemCommandExecuted,CanTSaveActiveaTabItemCommandExecuted);
+            OpenMainWindowCommand = new LambdaCommand(OnOpenMainWindowCommandExecuted, CanOpenMainWindowCommandExecuted);
         }
     }
 }

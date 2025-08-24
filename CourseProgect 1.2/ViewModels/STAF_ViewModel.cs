@@ -72,10 +72,7 @@ namespace CourseProgect_1._2.ViewModels
             if (par is not List<TabSystemItem> item) return;
             if (item.Count == 0)
             {
-                foreach (var item1 in item)
-                {
-                    SaveInFile(item1);
-                }
+                return;
             }
             else
             {
