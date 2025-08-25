@@ -69,12 +69,15 @@ namespace CourseProgect_1._2.ViewModels
                 Set(ref _selectedTabIndex, value);
             }
         }
+        private string NameProgect;
+        private string CoreFileProgect;
         public void LoadDirectory(string path)
         {
+            
             FileSystemItems.Clear();
 
             var directoryInfo = new DirectoryInfo(path);
-
+            NameProgect = directoryInfo.Name;
             // Создаем корневой узел
             var rootItem = new FileSystemItem
             {
@@ -99,6 +102,7 @@ namespace CourseProgect_1._2.ViewModels
                 // Загрузка подпапок
                 foreach (var dir in directoryInfo.GetDirectories())
                 {
+                    
                     var item = new FileSystemItem
                     {
                         Name = dir.Name,
@@ -115,6 +119,11 @@ namespace CourseProgect_1._2.ViewModels
                 // Загрузка файлов
                 foreach (var file in directoryInfo.GetFiles())
                 {
+                    if (Path.GetExtension(file.FullName) == ".xml" && NameProgect == Path.GetFileNameWithoutExtension(file.FullName))
+                    {
+                        CoreFileProgect = file.FullName;
+                        continue;
+                    }
                     parentItem.Children.Add(new FileSystemItem
                     {
                         Name = file.Name,
@@ -692,7 +701,6 @@ namespace CourseProgect_1._2.ViewModels
                 if (item.isSave == false)
                 {
                     SaveInFile(item);
-                    
                 }
             }
         }
@@ -922,11 +930,15 @@ namespace CourseProgect_1._2.ViewModels
             ClosingWebView = new LambdaCommand(OnClosingWebViewExecuted, CanClosingWebViewExecuted);
             TextChangedCommand = new LambdaCommand(OnTextChangedCommandExecuted, CanTextChangedCommandExecuted);
             SaveToClosed = new LambdaCommand(OnSaveToClosedExecuted, CanSaveToClosedExecuted);
+
             SaveAllCommand = new LambdaCommand(OnSaveAllCommandExecuted, CanTSaveAllCommandExecuted);
             SaveActiveaTabItemCommand = new LambdaCommand(OnSaveActiveaTabItemCommandExecuted,CanTSaveActiveaTabItemCommandExecuted);
+
             OpenMainWindowCommand = new LambdaCommand(OnOpenMainWindowCommandExecuted, CanOpenMainWindowCommandExecuted);
+
             ToСreateFileCommand = new LambdaCommand(OnToСreateFileCommandExecuted, CanToСreateFileCommandExecuted);
             ToСreateDirectoryCommand = new LambdaCommand(OnToСreateDirectoryCommandExecuted, CanToСreateDirectoryCommandExecuted);
+
             TabDragTabItem = new LambdaCommand(OnTabDragTabItemExecuted, CanTabDragTabItemExecuted);
             TabDropTabItem = new LambdaCommand(OnTabDropTabItemExecuted, CanTabDropTabItemExecuted);
             DragTreeItem = new LambdaCommand(OnDragTreeItemExecuted, CanDragTreeItemExecuted);

@@ -4,12 +4,13 @@ using CourseProgect_1._2.Models;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
 using CourseProgect_1._2.Views.Windows;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Win32;
 
 namespace CourseProgect_1._2.ViewModels
 {
@@ -29,17 +30,61 @@ namespace CourseProgect_1._2.ViewModels
             { 
                 Set(ref _Progect, value);
 
-
                 if (_Progect.Path is not null)
                 {
-                    var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+                    var itemsToRemove = new List<Progect>();
+
+                    foreach (var item in db.Progects)
+                    {
+                        try
+                        {
+                            if (!File.Exists(item.Path))
+                            {
+                                itemsToRemove.Add(item);
+                                continue;
+                            }
+
+                            XmlDocument xDoc = new XmlDocument();
+                            xDoc.Load(item.Path);
+                            XmlElement xRoot = xDoc.DocumentElement;
+
+                            if (xRoot == null || xRoot.Name != "Progect")
+                            {
+                                itemsToRemove.Add(item);
+                                continue;
+                            }
+
+                            string xmlName = xRoot.SelectSingleNode("Name")?.InnerText ?? "";
+                            string xmlPath = xRoot.SelectSingleNode("Path")?.InnerText ?? "";
+                            string xmlLastCallDate = xRoot.SelectSingleNode("Last_call_date")?.InnerText ?? "";
+
+                            if (item.Name == xmlName &&
+                                item.Path == xmlPath &&
+                                item.Last_call_date == xmlLastCallDate)
+                            {
+                                item.Last_call_date = DateTime.Now.ToString("G");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            itemsToRemove.Add(item);
+                        }
+                    }
+
+                    // Удаляем и сохраняем
+                    if (itemsToRemove.Any())
+                    {
+                        db.Progects.RemoveRange(itemsToRemove);
+                        db.SaveChanges();
+                    }
+                }
+                var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
                     var editor = new EditWindow(System.IO.Path.GetDirectoryName(_Progect.Path));
                     currentWindow?.Close();
                     editor.Show();
                 }
 
             }
-        }
         #endregion
 
         #region Заголовок окна
@@ -49,11 +94,12 @@ namespace CourseProgect_1._2.ViewModels
             get => _Title;
             set => Set(ref _Title, value);
         }
-        #endregion
+        #endregion+
 
         #region Функция OpenMainWindow
         private void OpenMainWindow(string Path, object par)
         {
+           
             EditWindow mainEditor = new EditWindow(Path);
             if (par is Window window)
                 window.Close();
@@ -76,16 +122,16 @@ namespace CourseProgect_1._2.ViewModels
                 Directory.CreateDirectory(window.TextBoxPathProgect.Text + "\\" + window.TextBoxNameProgect.Text);
                 XDocument xdoc = new XDocument();
                 XElement Prog = new XElement("Progect");
-                XAttribute NameProg = new XAttribute("Name", window.TextBoxNameProgect.Text);
+                XElement NameProg = new XElement("Name", window.TextBoxNameProgect.Text);
                 XElement PathProg = new XElement("Path", window.TextBoxPathProgect.Text + "\\" + window.TextBoxNameProgect.Text + "\\" + window.TextBoxNameProgect.Text + ".xml");
-                XElement DataProg = new XElement("Last_call_date", DateTime.Now.ToString("d"));
+                XElement DataProg = new XElement("Last_call_date", DateTime.Now.ToString("G"));
                 Prog.Add(NameProg);
                 Prog.Add(PathProg);
                 Prog.Add(DataProg);
                 xdoc.Add(Prog);
                 xdoc.Save(window.TextBoxPathProgect.Text + "\\" + window.TextBoxNameProgect.Text + "\\" + window.TextBoxNameProgect.Text + ".xml");
                 File.Create(window.TextBoxPathProgect.Text + "\\" + window.TextBoxNameProgect.Text + "\\Тестовый файл.md");
-                Progect progect = new Progect(window.TextBoxNameProgect.Text, window.TextBoxPathProgect.Text + "\\" + window.TextBoxNameProgect.Text + "\\" + window.TextBoxNameProgect.Text + ".xml", DateTime.Now.ToString("d"));
+                Progect progect = new Progect(window.TextBoxNameProgect.Text, window.TextBoxPathProgect.Text + "\\" + window.TextBoxNameProgect.Text + "\\" + window.TextBoxNameProgect.Text + ".xml", DateTime.Now.ToString("G"));
                 db.Progects.Add(progect);
                 db.SaveChanges();
                 OpenMainWindow(System.IO.Path.GetDirectoryName(progect.Path), par);
@@ -136,6 +182,8 @@ namespace CourseProgect_1._2.ViewModels
 
             List<Progect> pr = db.Progects.ToList();
             pr.Sort((x, y) => y.Last_call_date.CompareTo(x.Last_call_date));
+
+            var itemsToRemove = new List<Progect>();
             foreach (Progect a in pr)
             {
                 if (File.Exists(a.Path))
@@ -143,8 +191,14 @@ namespace CourseProgect_1._2.ViewModels
                     Progect _selectProgect = new Progect(a.Name, a.Path, a.Last_call_date);
                     Progects.Add(_selectProgect);
                 }
+                else
+                {
+                    itemsToRemove.Add(a);
+                    db.Progects.RemoveRange(itemsToRemove);
+                    
+                }
             }
-
+            db.SaveChanges();
             #endregion
 
             #region Команды
