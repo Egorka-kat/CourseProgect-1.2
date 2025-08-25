@@ -80,5 +80,22 @@ namespace CourseProgect_1._2.Views.Windows
                 ViewModel.TabDropTabItem.Execute(tabItem);
             }
         }
-    }
+
+        private void TreeViewStackPanel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is StackPanel stackPanel && stackPanel.DataContext is FileSystemItem TreeView)
+            {
+                ViewModel.DragTreeItem.Execute(TreeView);
+                DragDrop.DoDragDrop(stackPanel, TreeView, DragDropEffects.Copy);
+            }
+        }
+
+        private void TreeViewStackPanel_Drop(object sender, DragEventArgs e)
+        {
+            if (sender is StackPanel stackPanel && stackPanel.DataContext is FileSystemItem TreeView)
+            {
+                ViewModel.DropTreeItem.Execute(TreeView);
+            }
+        }
+    }   
 }

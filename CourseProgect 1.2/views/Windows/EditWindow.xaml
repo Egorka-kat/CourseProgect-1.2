@@ -72,6 +72,7 @@
                             <MenuItem Header="Открыть" 
                       Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
                       CommandParameter="{Binding}">
+                                
                                 <MenuItem.Style>
                                     <Style TargetType="MenuItem">
                                         <Setter Property="Visibility" Value="Visible"/>
@@ -123,7 +124,9 @@ CommandParameter="{Binding}"/>
                         </Style>
                         <HierarchicalDataTemplate DataType="{x:Type mod:FileSystemItem}" 
                      ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal" >
+                            <StackPanel Orientation="Horizontal" 
+                                        Drop="TreeViewStackPanel_Drop"
+                                        MouseLeftButtonDown="TreeViewStackPanel_MouseDown">
 
                                 <StackPanel.InputBindings>
                                     <MouseBinding MouseAction="LeftDoubleClick"
@@ -135,7 +138,10 @@ CommandParameter="{Binding}"/>
                                     <Style TargetType="StackPanel">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsDirectory}" Value="True">
-                                                <Setter Property="IsEnabled" Value="False"/>
+                                                <Setter Property="AllowDrop" Value="True"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsDirectory}" Value="False">
+                                                <Setter Property="AllowDrop" Value="False"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>

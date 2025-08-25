@@ -1,9 +1,12 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.models;
+using CourseProgect_1._2.services;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
 using CourseProgect_1._2.Views.Windows;
 using FontAwesome.WPF;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -18,7 +21,7 @@ namespace CourseProgect_1._2.ViewModels
         public ObservableCollection<TabSystemItem> TabItems { get; set; } = new ObservableCollection<TabSystemItem> 
         { };
         private TabSystemItem _ActiveaTabSystemItem;
-
+        private FileSystemItem DragFileItem;
         private TabSystemItem DragTabItem;
 
         public bool isClosed = true;
@@ -28,6 +31,7 @@ namespace CourseProgect_1._2.ViewModels
             set 
             {
                 Set(ref _ActiveaTabSystemItem, value);
+
             }
         }
 
@@ -53,6 +57,7 @@ namespace CourseProgect_1._2.ViewModels
                 // Можно вызвать здесь метод загрузки данных
 
                 LoadDirectory(_LoadPath);
+                SorterNameSystemFile(FileSystemItems);
             }
         }
         private int _selectedTabIndex;
@@ -90,7 +95,7 @@ namespace CourseProgect_1._2.ViewModels
             try
             {
                 var directoryInfo = new DirectoryInfo(parentItem.FullPath);
-
+      
                 // Загрузка подпапок
                 foreach (var dir in directoryInfo.GetDirectories())
                 {
@@ -103,9 +108,8 @@ namespace CourseProgect_1._2.ViewModels
                     };
 
                     parentItem.Children.Add(item);
-
                     // Рекурсивно загружаем вложенные папки (по необходимости)
-                    // LoadSubdirectories(item);
+                    LoadSubdirectories(item);
                 }
 
                 // Загрузка файлов
@@ -379,6 +383,7 @@ namespace CourseProgect_1._2.ViewModels
             {
 
             }
+            SorterNameSystemFile(FileSystemItems);
         }
         private void RefreshTreeView()
         {
@@ -491,7 +496,7 @@ namespace CourseProgect_1._2.ViewModels
         private bool CanOpenCommandExecuted(object par) => true;
         public void OnOpenCommandExecuted(object par)
         {
-            if (par is not FileSystemItem item) return;
+            if (par is not FileSystemItem item || item.IsDirectory == true) return;
 
             try
             {
@@ -721,6 +726,8 @@ namespace CourseProgect_1._2.ViewModels
 
             ToCreateFileWindow window = new ToCreateFileWindow(item);
             window.ShowDialog();
+
+            SorterNameSystemFile(FileSystemItems);
         }
         #endregion
         #region ToСreateDirectoryCommand
@@ -732,6 +739,8 @@ namespace CourseProgect_1._2.ViewModels
 
             ToCreateDirectoryWindow window = new ToCreateDirectoryWindow(item);
             window.ShowDialog();
+
+            SorterNameSystemFile(FileSystemItems);
         }
         #endregion
         #region TabDragTabItem
@@ -748,13 +757,161 @@ namespace CourseProgect_1._2.ViewModels
         private bool CanTabDropTabItemExecuted(object par) => true;
         public void OnTabDropTabItemExecuted(object par)
         {
-            if (par is not TabSystemItem item) return;
-            int indexFirst  = TabItems.IndexOf(DragTabItem);
+            if (par is not TabSystemItem item || DragTabItem == item) return;
+            int indexFirst = TabItems.IndexOf(DragTabItem);
             int indexSecond = TabItems.IndexOf(item);
             TabItems.Move(indexFirst, indexSecond);
             SelectedTabIndex = indexSecond;
+
+            SorterNameSystemFile(FileSystemItems);
         }
         #endregion
+
+        #region DragTreeItem
+        public ICommand? DragTreeItem { get; set; }
+        private bool CanDragTreeItemExecuted(object par) => true;
+        public void OnDragTreeItemExecuted(object par)
+        {
+            if (par is not FileSystemItem item) return;
+            DragFileItem = item;
+        }
+        #endregion
+        #region DropTreeItem
+        public ICommand? DropTreeItem { get; set; }
+        private bool CanDropTreeItemExecuted(object par) => true;
+        public void OnDropTreeItemExecuted(object par)
+        {
+            if (par is not FileSystemItem item || item == DragFileItem) return;
+
+            if (DragFileItem.IsDirectory)
+            {
+                string oldPath = DragFileItem.FullPath;
+                string newPath = item.FullPath + "\\" + Path.GetFileName(DragFileItem.FullPath);
+                if (oldPath != newPath)
+                {
+                    Directory.Move(oldPath, newPath);
+                    СhangePathFileinDirectory(DragFileItem.Children, newPath);
+                    item.Children.Add(new FileSystemItem
+                    {
+                        Name = Path.GetFileName(newPath),
+                        FullPath = newPath,
+                        IsDirectory = true,
+                        Children = DragFileItem.Children
+                    });
+                    DeleteFileSystemItem(DragFileItem, FileSystemItems);
+                }
+            }
+            else
+            {
+                string oldPath = DragFileItem.FullPath;
+                string newPath = item.FullPath + "\\" + Path.GetFileName(DragFileItem.FullPath);
+                try
+                {
+                    File.Move(oldPath, newPath);
+                }
+                catch (IOException ex)
+                {
+                    MessageBox.Show($"Ошибка: {ex.Message}");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка: {ex.Message}");
+                    return;
+                }
+                DeleteFileSystemItem(DragFileItem, FileSystemItems);
+
+                item.Children.Add(new FileSystemItem
+                {
+                    Name = Path.GetFileName(newPath),
+                    FullPath = newPath,
+                    IsDirectory = false
+                });
+                SearchInTabItemsToFileSystem(oldPath, newPath);
+
+            }
+            SorterNameSystemFile(FileSystemItems);
+        }
+        private void СhangePathFileinDirectory(ObservableCollection<FileSystemItem> Children, string newPath)
+        {
+            foreach (FileSystemItem item in Children)
+            {
+                switch (item.IsDirectory)
+                {
+                    case true:
+                        string NewPath =  newPath + "\\" + Path.GetFileName(item.FullPath);
+                        item.FullPath = NewPath;
+                        СhangePathFileinDirectory(item.Children, NewPath);
+                        break;
+                    default:
+                        string oldPath = item.FullPath;
+                        string NewPath1 = newPath + "\\" + Path.GetFileName(oldPath);
+                        item.FullPath = NewPath1;
+                        SearchInTabItemsToFileSystem(oldPath, NewPath1);
+                        break;
+                }
+            }
+        }
+        private void SearchInTabItemsToFileSystem(string oldPath, string newPath)
+        {
+            foreach (var item in TabItems)
+            {
+                if (item.Path == oldPath)
+                {
+                    item.Path = newPath;
+                    break;
+                }
+            }
+        }
+        private bool DeleteFileSystemItem(FileSystemItem fileItem, ObservableCollection<FileSystemItem> items)
+        {
+            if (items.Remove(fileItem))
+                return true;
+
+            // Рекурсивный поиск в детях
+            foreach (var item in items)
+            {
+                if (item.Children != null && DeleteFileSystemItem(fileItem, item.Children))
+                    return true;
+            }
+
+            return false;
+
+        }
+        #endregion
+        private void SorterNameSystemFile(ObservableCollection<FileSystemItem> items)
+        {
+            if (items == null) return;
+
+            // Создаем временный список для сортировки
+            var itemsList = items.ToList();
+
+            // Сортируем с учетом типа (папки/файлы)
+            itemsList.Sort((x, y) =>
+            {
+                if (x.IsDirectory && !y.IsDirectory) return -1;
+                if (!x.IsDirectory && y.IsDirectory) return 1;
+                return string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+            });
+
+            // Перемещаем элементы в правильном порядке
+            for (int i = 0; i < itemsList.Count; i++)
+            {
+                var currentItem = itemsList[i];
+                int currentIndex = items.IndexOf(currentItem);
+
+                if (currentIndex != i)
+                {
+                    items.Move(currentIndex, i);
+                }
+
+                // Рекурсивно сортируем детей
+                if (currentItem.IsDirectory && currentItem.Children != null)
+                {
+                    SorterNameSystemFile(currentItem.Children);
+                }
+            }
+        }
         public EW_ViewModel()
         {
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
@@ -772,6 +929,8 @@ namespace CourseProgect_1._2.ViewModels
             ToСreateDirectoryCommand = new LambdaCommand(OnToСreateDirectoryCommandExecuted, CanToСreateDirectoryCommandExecuted);
             TabDragTabItem = new LambdaCommand(OnTabDragTabItemExecuted, CanTabDragTabItemExecuted);
             TabDropTabItem = new LambdaCommand(OnTabDropTabItemExecuted, CanTabDropTabItemExecuted);
+            DragTreeItem = new LambdaCommand(OnDragTreeItemExecuted, CanDragTreeItemExecuted);
+            DropTreeItem = new LambdaCommand(OnDropTreeItemExecuted, CanDropTreeItemExecuted);
         }
     }
 }
