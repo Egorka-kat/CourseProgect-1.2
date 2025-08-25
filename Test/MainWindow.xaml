@@ -4,24 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Test"
-         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-        mc:Ignorable="d"
-        Title="AvalonEdit Demo" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <ListBox Name="phonesList">
-            <TextBlock FontWeight="Bold" TextDecorations="Underline" Text="Новинки 2015 года" />
-            <ListBoxItem Background="LightGray">LG Nexus 5X</ListBoxItem>
-            <ListBoxItem>Huawei Nexus 6P</ListBoxItem>
-            <ListBoxItem Background="LightGray">iPhone 6S</ListBoxItem>
-            <ListBoxItem>iPhone 6S Plus</ListBoxItem>
-            <ListBoxItem Background="LightGray">Аsus Zenphone 2</ListBoxItem>
-            <ListBoxItem>Microsoft Lumia 950</ListBoxItem>
-        </ListBox>
-    </Grid>
+       xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+        Title="Simple MD Viewer" 
+        Height="500" 
+        Width="700"
+        WindowStartupLocation="CenterScreen">
+
+    <DockPanel>
+        <!-- Кнопка открытия файла -->
+        <Button DockPanel.Dock="Top" 
+                Content="Open MD File" 
+                Click="OpenButton_Click"
+                Margin="10" 
+                Padding="10,5"
+                HorizontalAlignment="Left"/>
+
+        <!-- Просмотрщик Markdown -->
+        <ScrollViewer>
+            <markdig:MarkdownViewer x:Name="MarkdownViewer" Margin="15"/>
+        </ScrollViewer>
+    </DockPanel>
 </Window>

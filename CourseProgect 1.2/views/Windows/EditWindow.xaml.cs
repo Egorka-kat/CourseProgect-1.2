@@ -1,6 +1,8 @@
 ﻿using CourseProgect_1._2.models;
 using CourseProgect_1._2.ViewModels;
 using ICSharpCode.AvalonEdit;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -95,6 +97,34 @@ namespace CourseProgect_1._2.Views.Windows
             if (sender is StackPanel stackPanel && stackPanel.DataContext is FileSystemItem TreeView)
             {
                 ViewModel.DropTreeItem.Execute(TreeView);
+            }
+        }
+
+        private void webView_Loaded(object sender, RoutedEventArgs e)
+        {
+            var webView = sender as WebView2;
+            if (webView != null && webView.CoreWebView2 == null)
+            {
+                // Отложенная инициализация через задачу
+                _ = InitializeWebViewAsync(webView);
+            }
+        }
+
+        private async Task InitializeWebViewAsync(WebView2 webView)
+        {
+            try
+            {
+                var browserFolder = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "YourAppName",
+                    "WebView2");
+
+                var environment = await CoreWebView2Environment.CreateAsync(null, browserFolder);
+                await webView.EnsureCoreWebView2Async(environment);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка инициализации WebView2: {ex.Message}");
             }
         }
     }   

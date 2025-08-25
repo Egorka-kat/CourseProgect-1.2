@@ -8,21 +8,36 @@ namespace CourseProgect_1._2.models
     class TabSystemItem : ViewModel
     {
         private string _TitleName;
-        public string TitleName { get => _TitleName;
-            set
-            {
-                Set(ref _TitleName, value);
-            }
+        public string TitleName
+        {
+            get => _TitleName;
+            set => Set(ref _TitleName, value);
         }
+
         private string _Path;
         public string Path
         {
             get => _Path;
             set
             {
-                Set(ref _Path, value);
-                UpdateSyntaxHighlightingFromExtension();
-                OnPropertyChanged(nameof(UriPath));
+                if (Set(ref _Path, value))
+                {
+                    UpdateSyntaxHighlightingFromExtension();
+                    OnPropertyChanged(nameof(UriPath));
+                }
+            }
+        }
+
+        private bool _IsMd = false;
+        public bool IsMd
+        {
+            get => _IsMd;
+            set
+            {
+                if (Set(ref _IsMd, value))
+                {
+                    OnPropertyChanged(nameof(UriPath)); // Если UriPath зависит от IsMd
+                }
             }
         }
         private Uri ConvertToDataUri(string markdownText)
@@ -231,78 +246,43 @@ namespace CourseProgect_1._2.models
             get
             {
                 if (string.IsNullOrEmpty(Path)) return null;
+
                 try
                 {
-                    if (System.IO.Path.GetExtension(Path).ToLower() == ".md")
+                    if (IsMd && System.IO.Path.GetExtension(Path).ToLower() == ".md")
                     {
-                        var pipeline = new Markdig.MarkdownPipelineBuilder()
-       .UseAdvancedExtensions() // Включает таблицы, списки задач и др.
-       .UseEmojiAndSmiley()     // Поддержка emoji
-       .UseMathematics()        // Поддержка математических формул
-       .UseAutoLinks()          // Автоматические ссылки
-       .Build();
-
-                        string htmlContent = Text;
-                        //string html = Westwind.AspNetCore.Markdown.Markdown.Parse(htmlContent);
-                        //byte[] bytes2 = Encoding.UTF8.GetBytes(html.ToString());
-                        //string base64Content2 = Convert.ToBase64String(bytes2);
-                        //// Остальной код такой же как выше...
-                        //string dataUrl2 = $"data:text/markdown;base64,{base64Content2}";
-                        return ConvertToDataUri(htmlContent);
+                        // Для MD файлов
+                        string htmlContent = Markdig.Markdown.ToHtml(Text);
+                        // ... ваш код для MD ...
+                        byte[] bytes = Encoding.UTF8.GetBytes(htmlContent);
+                        string base64Content = Convert.ToBase64String(bytes);
+                        return new Uri($"data:text/html;base64,{base64Content}");
                     }
-                    if (System.IO.Path.GetExtension(Path).ToLower() == ".html")
+                    else if (System.IO.Path.GetExtension(Path).ToLower() == ".html")
                     {
+                        // Для HTML файлов
                         byte[] bytes = Encoding.UTF8.GetBytes(Text);
                         string base64Content = Convert.ToBase64String(bytes);
-                        string dataUrl = $"data:text/html;base64,{base64Content}";
-                        //return new Uri($"data:text/html;base64,{Convert.ToBase64String(Encoding.ASCII.GetBytes(Text))}");
-                        return (new Uri(dataUrl));
+                        return new Uri($"data:text/html;base64,{base64Content}");
                     }
-                    string formattedText = Text.Replace("&", "&amp;")
-    .Replace("<", "&lt;")
-    .Replace(">", "&gt;")
-    .Replace("\"", "&quot;")
-    .Replace("'", "&#39;")
-    .Replace("\r\n", "<br>")
-    .Replace("\n", "<br>")
-    .Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"); // 4 пробела для табуляции
+                    else
+                    {
+                        // Для обычных текстовых файлов
+                        string formattedText = Text.Replace("&", "&amp;")
+                            .Replace("<", "&lt;")
+                            .Replace(">", "&gt;")
+                            .Replace("\"", "&quot;")
+                            .Replace("'", "&#39;")
+                            .Replace("\r\n", "<br>")
+                            .Replace("\n", "<br>")
+                            .Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
 
-                    // Создаем HTML с сохранением форматирования
-                    string htmlContent1 = $@"
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset='utf-8'>
-        <style>
-            body {{
-                font-family: Consolas, 'Courier New', monospace;
-                white-space: pre-wrap; /* Сохраняет пробелы и переносы */
-                word-wrap: break-word;
-                background-color: #f8f9fa;
-                padding: 20px;
-                line-height: 1.5;
-            }}
-            .text-content {{
-                background-color: white;
-                border: 1px solid #ddd;
-                padding: 15px;
-                border-radius: 5px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }}
-        </style>
-    </head>
-    <body>
-        <div class='text-content'>
-            {formattedText}
-        </div>
-    </body>
-    </html>";
+                        string htmlContent = $@"<!DOCTYPE html><html><head><meta charset='utf-8'><style>body {{ font-family: Consolas, 'Courier New', monospace; white-space: pre-wrap; }}</style></head><body>{formattedText}</body></html>";
 
-                    byte[] bytes1 = Encoding.UTF8.GetBytes(htmlContent1);
-                    string base64Content1 = Convert.ToBase64String(bytes1);
-                    string dataUrl1 = $"data:text/html;base64,{base64Content1}";
-                    //return new Uri($"data:text/html;base64,{Convert.ToBase64String(Encoding.ASCII.GetBytes(Text))}");
-                    return (new Uri(dataUrl1));
+                        byte[] bytes = Encoding.UTF8.GetBytes(htmlContent);
+                        string base64Content = Convert.ToBase64String(bytes);
+                        return new Uri($"data:text/html;base64,{base64Content}");
+                    }
                 }
                 catch
                 {
@@ -315,11 +295,9 @@ namespace CourseProgect_1._2.models
         public TextDocument Document
         {
             get => _document;
-            set
-            {
-                Set(ref _document, value);
-            }
+            set => Set(ref _document, value);
         }
+
         private string _Text;
         public string Text
         {
@@ -328,10 +306,9 @@ namespace CourseProgect_1._2.models
             {
                 if (Set(ref _Text, value))
                 {
-                    // Обновляем документ только если текст действительно изменился
                     if (Document.Text != value)
-                    {                        Document.Text = value;
-                        
+                    {
+                        Document.Text = value;
                     }
                     OnPropertyChanged(nameof(UriPath));
                 }
@@ -350,6 +327,9 @@ namespace CourseProgect_1._2.models
 
             var extension = System.IO.Path.GetExtension(Path).ToLower();
 
+            // ✅ Используем свойство с Set() методом
+            IsMd = (extension == ".md");
+
             SyntaxHighlighting = extension switch
             {
                 ".cs" => HighlightingManager.Instance.GetDefinition("C#"),
@@ -362,6 +342,7 @@ namespace CourseProgect_1._2.models
                 ".md" => HighlightingManager.Instance.GetDefinition("Markdown"),
                 _ => null
             };
+
             OnPropertyChanged(nameof(SyntaxHighlighting));
         }
 
@@ -371,6 +352,7 @@ namespace CourseProgect_1._2.models
         {
             this.TitleName = TitleName;
             this.Path = Path;
+
             Document = new TextDocument();
             Document.TextChanged += (s, e) =>
             {
@@ -381,6 +363,7 @@ namespace CourseProgect_1._2.models
             // Инициализация начальным текстом
             Text = ReadFile();
         }
+
         public string ReadFile()
         {
             try
@@ -389,8 +372,7 @@ namespace CourseProgect_1._2.models
             }
             catch (Exception ex)
             {
-                // Обработка ошибок
-                return string.Empty;
+                return $"Error reading file: {ex.Message}";
             }
         }
     }

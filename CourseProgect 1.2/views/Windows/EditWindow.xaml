@@ -9,6 +9,7 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
         Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="EditWindow" Height="450" Width="800" Closing="Window_Closing">
@@ -66,7 +67,7 @@
                     <ColumnDefinition x:Name="Col3" Width="35*" />
                 </Grid.ColumnDefinitions>
                 <!--#region TreeView-->
-                <TreeView Margin="6" ItemsSource="{Binding FileSystemItems}">
+                <TreeView Margin="6,6,10,6" ItemsSource="{Binding FileSystemItems}">
                     <TreeView.Resources>
                         <ContextMenu x:Key="ItemContextMenu">
                             <MenuItem Header="Открыть" 
@@ -178,7 +179,7 @@ CommandParameter="{Binding}"/>
                             SelectedIndex="{Binding SelectedTabIndex}"
                             SelectedItem="{Binding ActiveaTabSystemItem, Mode=Default}"
                             Grid.Column="1" 
-                            Margin="3">
+                            Margin="5,3,5,5">
                     <TabControl.Resources>
                         <Style x:Key="CloseButtonStyle" TargetType="Button">
                             <Setter Property="Template">
@@ -240,7 +241,22 @@ CommandParameter="{Binding}"/>
                 </TabControl>
                 <!--#endregion-->
                 <!--#region  WebView-->
-                <wv2:WebView2 x:Name="webView" Grid.Column="2" Margin="5" DataContext="{Binding ActiveaTabSystemItem}"  Source="{Binding UriPath}"  HorizontalAlignment="Stretch"  />
+                <Grid Grid.Column="2" DataContext="{Binding ActiveaTabSystemItem}">
+
+                    <!-- WebView2 - скрыт когда IsMd = true -->
+                    <wv2:WebView2 x:Name="webView" 
+                                  Margin="5"
+                  Source="{Binding UriPath}"
+                  Visibility="{Binding IsMd, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=inverse}"/>
+
+                    <!-- MarkdownViewer - виден когда IsMd = true -->
+                    <ScrollViewer Margin="5">
+                        <markdig:MarkdownViewer x:Name="MarkdownViewer" 
+                               Markdown="{Binding Text}"
+                               Visibility="{Binding IsMd, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </ScrollViewer>
+
+                </Grid>
                 <!--#endregion-->
             </Grid>
         </DockPanel>
