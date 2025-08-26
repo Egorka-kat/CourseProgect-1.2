@@ -1,5 +1,6 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.models;
+using CourseProgect_1._2.services.Localization;
 using CourseProgect_1._2.ViewModels.Base;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace CourseProgect_1._2.ViewModels
 {
     internal class STAF_ViewModel : ViewModel
     {
+        ALocalization localization = new ALocalization();
         public ObservableCollection<TabSystemItem> TabItems { get; set; } = new ObservableCollection<TabSystemItem>
         { };
         private TabSystemItem _ActiveaTabSystemItem;
@@ -25,6 +27,17 @@ namespace CourseProgect_1._2.ViewModels
             {
                 Set(ref _ActiveaTabSystemItem, value);
             }
+        }
+        public string StringSaveChangesToCurrentFiles => localization["Save changes to current files"];
+        public string StringSave => localization["Save"];
+        public string StringOnSave => localization["OnSave"];
+        public string StringCalcer => localization["Calcer"];
+        private void OnLanguageChanged()
+        {
+            OnPropertyChanged(nameof(StringSaveChangesToCurrentFiles));
+            OnPropertyChanged(nameof(StringSave));
+            OnPropertyChanged(nameof(StringOnSave));
+            OnPropertyChanged(nameof(StringCalcer));
         }
         public ICommand? Save { get; set; }
         private bool CanSaveExecuted(object par) => true;
@@ -61,7 +74,7 @@ namespace CourseProgect_1._2.ViewModels
             catch (Exception ex)
             {
 
-                MessageBox.Show($"Ошибка при сохранении {item.TitleName}: {ex.Message}", "Ошибка",
+                MessageBox.Show($"{localization["Error when saving"]} {item.TitleName}: {ex.Message}", localization["Error"],
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

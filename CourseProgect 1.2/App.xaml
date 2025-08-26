@@ -11,7 +11,7 @@
         <con:OpenCommandConverter x:Key="OpenCommandConverter"/>
         <ser:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <!-- Конвертер иконок -->
-        <mod:IconConverter x:Key="IconConverter"/>
+        <ser:IconConverter x:Key="IconConverter"/>
         <ser:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
         
         

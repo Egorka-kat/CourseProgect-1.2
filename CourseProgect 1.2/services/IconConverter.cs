@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace CourseProgect_1._2.models
+namespace CourseProgect_1._2.services
 {
     public class IconConverter : IValueConverter
     {

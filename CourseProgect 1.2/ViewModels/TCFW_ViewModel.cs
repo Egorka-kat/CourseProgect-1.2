@@ -1,5 +1,6 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.models;
+using CourseProgect_1._2.services.Localization;
 using CourseProgect_1._2.ViewModels.Base;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,26 @@ namespace CourseProgect_1._2.ViewModels
 {
     class TCFW_ViewModel : ViewModel
     {
+        ALocalization localization = new ALocalization();
+        public string StringFileType => localization["File Type"];
+        public string StringAnother => localization["Another..."];
+        public string StringplainText => localization["Plain text"];
+        public string StringFileName => localization["File Name"];
+        public string StringExpansion => localization["Expansion"];
+        public string StringCalcer => localization["Calcer"];
+        public string StringToCreate => localization["To create"];
+
+        private void OnLanguageChanged()
+        {
+            OnPropertyChanged(nameof(StringFileType));
+            OnPropertyChanged(nameof(StringAnother));
+            OnPropertyChanged(nameof(StringplainText));
+            OnPropertyChanged(nameof(StringFileName));
+            OnPropertyChanged(nameof(StringExpansion));
+            OnPropertyChanged(nameof(StringCalcer));
+            OnPropertyChanged(nameof(StringToCreate));
+        }
+
         private FileSystemItem Directory;
         private FileType _selectedFileType;
         private string _customExtension;
@@ -74,7 +95,6 @@ namespace CourseProgect_1._2.ViewModels
                    IsValidExtension(GetCurrentExtension());
         private void CreateFile(object par)
         {
-            // Логика создания файла
             var extension = GetCurrentExtension();
             var fullName = $"{FileName}{extension}";
             string PathNewFile = Directory.FullPath + "\\" + fullName;
@@ -96,7 +116,7 @@ namespace CourseProgect_1._2.ViewModels
                 }
             }
             Closer = false;
-            MessageBox.Show("Данные некорректные данные", "Ошибка создания файла",
+            MessageBox.Show(localization["The data is incorrect"], localization["File creation error"],
                       MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 

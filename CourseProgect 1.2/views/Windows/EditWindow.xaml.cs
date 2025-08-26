@@ -127,5 +127,17 @@ namespace CourseProgect_1._2.Views.Windows
                 MessageBox.Show($"Ошибка инициализации WebView2: {ex.Message}");
             }
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var clickedItem = sender as MenuItem;
+            if (clickedItem != null && clickedItem.Header != null)
+            {
+                string language = clickedItem.Header.ToString();
+                // Изменяем язык или выполняем другие действия
+
+                ViewModel.ChangeLanguageCommand.Execute(language);
+            }
+        }
     }   
 }

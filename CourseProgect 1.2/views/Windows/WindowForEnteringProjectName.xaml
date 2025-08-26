@@ -7,27 +7,32 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:vm ="clr-namespace:CourseProgect_1._2.viewmodels"
         mc:Ignorable="d"
-        Height="140" Width="316"  ResizeMode="NoResize">
+        Height="160" Width="400"  ResizeMode="NoResize">
     <Window.DataContext>
         <vm:WFEPN_ViewModel/>
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="7*"/>
+            <RowDefinition Height="3.5*"/>
+            <RowDefinition Height="3.5*"/>
             <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="6*"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0">
-            <TextBox  x:Name="TextBoxNameProgect" Text="{Binding TextBox_NameProgect, UpdateSourceTrigger=PropertyChanged}"  Margin="10" />
-            <TextBox x:Name="TextBoxPathProgect" Text="{Binding TextBox_PathProgect}" Margin="10,0,10,10" IsReadOnly="True"/>
-        </StackPanel>
-        <Button Command="{Binding OpenExplorer}"  Grid.Column="1" Grid.Row="0" Margin="10,38,10,16" Style="{StaticResource BTND}">
+        <DockPanel Grid.Column="0" Grid.Row="0">
+            <TextBlock DockPanel.Dock="Left" Text="{Binding StringProjectName}"  Margin="5,10,5,10"/>
+            <TextBox  x:Name="TextBoxNameProgect" DockPanel.Dock="Right" Text="{Binding TextBox_NameProgect, UpdateSourceTrigger=PropertyChanged}"  Margin="0,10,10,10" />
+        </DockPanel>
+        <DockPanel Grid.Column="0" Grid.Row="1">
+            <TextBlock DockPanel.Dock="Left" Text="{Binding StringProjectPath}" Margin="5,10,5,10" />
+            <TextBox IsEnabled="False" x:Name="TextBoxPathProgect" DockPanel.Dock="Right" Text="{Binding TextBox_PathProgect}" Margin="0,10,10,10" IsReadOnly="True"/>
+        </DockPanel>
+        <Button Command="{Binding OpenExplorer}"  Grid.Column="1" Grid.Row="1" Margin="10,8,10,8" Style="{StaticResource BTND}">
             <fa:ImageAwesome Icon="FolderOutlinepenOutline" Margin="1.5"  VerticalAlignment="Center" HorizontalAlignment="Center" />
         </Button>
-        <Button Command="{Binding CloseWindowCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="1" Content="Отмена" Grid.Column="0" Margin="190,4,10,4"  Style="{StaticResource BTND}"/>
-        <Button Command="{Binding ClickOk}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="1" Content="Ок" Grid.Column="1" Margin="10,4,10,4"  Style="{StaticResource BTND}"/>
+        <Button Command="{Binding CloseWindowCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="2" Content="{Binding StringCalcer}" Grid.Column="0" Margin="250,4,10,4"  Style="{StaticResource BTND}"/>
+        <Button Command="{Binding ClickOk}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="2" Content="{Binding StringOk}" Grid.Column="1" Margin="10,4,10,4"  Style="{StaticResource BTND}"/>
     </Grid>
 </Window>

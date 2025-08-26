@@ -11,10 +11,8 @@ namespace CourseProgect_1._2.models
         {
             if (value is bool isOpen)
             {
-                // Для булевых значений
                 return isOpen ? FontAwesomeIcon.AngleDoubleRight : FontAwesomeIcon.AngleDoubleLeft;
             }
-            // Значение по умолчанию
             return FontAwesomeIcon.AngleDoubleRight;
         }
 

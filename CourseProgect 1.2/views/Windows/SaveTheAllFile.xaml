@@ -6,11 +6,11 @@
         xmlns:vm="clr-namespace:CourseProgect_1._2.ViewModels"
         xmlns:local="clr-namespace:CourseProgect_1._2.views.Windows"
         mc:Ignorable="d"
-        Title="TextEditor" Height="245" Width="300" WindowStyle="SingleBorderWindow" ResizeMode="NoResize">
+        Title="TextEditor" Height="245" Width="340" WindowStyle="SingleBorderWindow" ResizeMode="NoResize">
     <Grid>
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
-                <TextBlock Margin="25,5,25,0">Сохранить ихменения в текущих файлах?</TextBlock>
+                <TextBlock Margin="25,5,25,0" Text="{Binding StringSaveChangesToCurrentFiles}"/>
             </StackPanel>
             <Grid DockPanel.Dock="Top">
                 <ListBox  x:Name="LB_SelectItem" Margin="25,5,25,5" Height="130" 
@@ -18,7 +18,6 @@
          SelectedItem="{Binding SelectedTabIndex}"
          SelectionMode="Multiple">
 
-                    <!-- Шаблон для элементов списка -->
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding TitleName}">
@@ -42,9 +41,9 @@
                     <ColumnDefinition Width="6*" />
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Margin="25,8,5,12" Content="Сохранить" Click="SaveButton"/>
-                <Button Grid.Column="1" Margin="15,8,15,12" Content="Не Сохранять" Click="OnSaveButton"/>
-                <Button Grid.Column="2" Margin="5,8,25,12" Content="Отмена" Click="CalcerButton"/>
+                <Button Grid.Column="0" Margin="25,8,5,12" Content="{Binding StringSave}" Click="SaveButton"/>
+                <Button Grid.Column="1" Margin="10,8,10,12" Content="{Binding StringOnSave}" Click="OnSaveButton"/>
+                <Button Grid.Column="2" Margin="5,8,25,12" Content="{Binding StringCalcer}" Click="CalcerButton"/>
             </Grid>
         </DockPanel>
     </Grid>

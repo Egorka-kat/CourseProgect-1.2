@@ -28,5 +28,21 @@
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.8" />
     <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.24.0" />
   </ItemGroup>
+	<Target Name="CopyLanguageFolder" AfterTargets="Build">
+		<Message Text="Копирование папки Language со всеми подпапками..." Importance="high" />
 
+		<!-- Создаем целевую папку -->
+		<MakeDir Directories="$(OutputPath)Language" Condition="!Exists('$(OutputPath)Language')" />
+
+		<!-- Копируем ВСЕ содержимое папки Language -->
+		<ItemGroup>
+			<AllLanguageFiles Include="$(ProjectDir)Language\**\*.*" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(AllLanguageFiles)"
+			  DestinationFiles="@(AllLanguageFiles->'$(OutputPath)Language\%(RecursiveDir)%(Filename)%(Extension)')"
+			  SkipUnchangedFiles="true" />
+
+		<Message Text="Скопировано файлов: @(AllLanguageFiles->Count())" Importance="high" />
+	</Target>
 </Project>

@@ -1,11 +1,13 @@
 ﻿using CourseProgect_1._2.data.SQLite;
 using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.Models;
+using CourseProgect_1._2.services.Localization;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
 using CourseProgect_1._2.Views.Windows;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -19,8 +21,15 @@ namespace CourseProgect_1._2.ViewModels
         #region Инициализация
         ConnectDataBase db;
         public ObservableCollection<Progect> Progects { get; set; }
+        ALocalization localization = new ALocalization();
         #endregion
-
+        public string StringExportAProject => localization["Export a project"];
+        public string StringCreateANewProject => localization["Create a new project"];
+        private void OnLanguageChanged()
+        {
+            OnPropertyChanged(nameof(StringExportAProject));
+            OnPropertyChanged(nameof(StringCreateANewProject));
+        }
         #region Инициализация выбраного Progect
         private Progect? _Progect;
         public Progect Progect

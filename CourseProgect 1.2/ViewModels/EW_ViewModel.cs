@@ -1,12 +1,12 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.models;
-using CourseProgect_1._2.services;
+using CourseProgect_1._2.services.Localization;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
 using CourseProgect_1._2.Views.Windows;
 using FontAwesome.WPF;
+using ICSharpCode.AvalonEdit.Search;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -17,13 +17,50 @@ namespace CourseProgect_1._2.ViewModels
 {
     class EW_ViewModel : ViewModel
     {
+        ALocalization localization = new ALocalization();
+        public ObservableCollection<string> loc
+        {
+            get => localization.language;
+            set { Set(ref localization.language, value);  }
+        }
         public ObservableCollection<FileSystemItem> FileSystemItems { get; set; } = new ObservableCollection<FileSystemItem>();
         public ObservableCollection<TabSystemItem> TabItems { get; set; } = new ObservableCollection<TabSystemItem> 
         { };
         private TabSystemItem _ActiveaTabSystemItem;
         private FileSystemItem DragFileItem;
         private TabSystemItem DragTabItem;
+        #region перевод
+        public string StringFile => localization["File"];
+        public string StringOpenAProject => localization["Open a project"];
+        public string StringSaveEverything => localization["Save everything"];
+        public string StringSave => localization["Save"];
+        public string StringLanguage => localization["Language"];
 
+
+        public string StringOpen => localization["Open"];
+        public string StringCreateAFile => localization["Create a file"];
+        public string StringCreateAFolder => localization["Create a folder"];
+        public string StringRename => localization["Rename"];
+        public string StringDelete => localization["Delete"];
+        private void OnLanguageChanged()
+        {
+            #region Перевод верхнего меню
+            OnPropertyChanged(nameof(StringFile));
+            OnPropertyChanged(nameof(StringOpenAProject));
+            OnPropertyChanged(nameof(StringSaveEverything));
+            OnPropertyChanged(nameof(StringSave));
+
+            OnPropertyChanged(nameof(StringLanguage));
+            #endregion
+            #region Перевод ContextMenu для TreeView
+            OnPropertyChanged(nameof(StringOpen));
+            OnPropertyChanged(nameof(StringCreateAFile));
+            OnPropertyChanged(nameof(StringCreateAFolder));
+            OnPropertyChanged(nameof(StringRename));
+            OnPropertyChanged(nameof(StringDelete));
+            #endregion
+        }
+        #endregion
         public bool isClosed = true;
         public TabSystemItem ActiveaTabSystemItem
         {
@@ -54,8 +91,6 @@ namespace CourseProgect_1._2.ViewModels
             {
                 _LoadPath = value;
                 Set(ref _LoadPath, value);
-                // Можно вызвать здесь метод загрузки данных
-
                 LoadDirectory(_LoadPath);
                 SorterNameSystemFile(FileSystemItems);
             }
@@ -238,9 +273,9 @@ namespace CourseProgect_1._2.ViewModels
             {
                 // Запрос подтверждения удаления
                 var result = MessageBox.Show(
-                    $"Вы уверены, что хотите удалить {(item.IsDirectory ? "папку" : "файл")} '{item.Name}'?",
-                    "Подтверждение удаления",
-                    MessageBoxButton.YesNo,
+                    $"{localization["Are you sure you want to delete"]} {(item.IsDirectory ? localization["the folder"] : localization["file"])} '{item.Name}'?",
+                    localization["Confirmation of deletion"],
+                    MessageBoxButton.YesNo, 
                     MessageBoxImage.Warning);
 
                 if (result != MessageBoxResult.Yes) return;
@@ -260,29 +295,27 @@ namespace CourseProgect_1._2.ViewModels
                         return;
                 }
 
-                // Удаляем элемент из родительской коллекции в UI потоке
                 await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     RemoveItemFromTree(item);
                 });
 
-                // Уведомление об успешном удалении
-                MessageBox.Show($"'{item.Name}' успешно удален", "Успех",
+                MessageBox.Show($"'{item.Name}' {localization["successfully deleted"]}", localization["Success"],
                                MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (UnauthorizedAccessException ex)
             {
-                MessageBox.Show($"Нет прав для удаления: {ex.Message}", "Ошибка",
+                MessageBox.Show($"{localization["I don't have the rights to delete it"]}: {ex.Message}", localization["Error"],
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (IOException ex)
             {
-                MessageBox.Show($"Файл используется другой программой: {ex.Message}", "Ошибка",
+                MessageBox.Show($"{localization["The file is being used by another program"]}: {ex.Message}", localization["Error"],
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при удалении: {ex.Message}", "Ошибка",
+                MessageBox.Show($"{localization["Error when deleting"]}: {ex.Message}", localization["Error"],
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -320,8 +353,8 @@ namespace CourseProgect_1._2.ViewModels
                 string newName = await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     return Microsoft.VisualBasic.Interaction.InputBox(
-                        "Введите новое имя:",
-                        "Переименование",
+                        $"{localization["Enter a new name"]}:",
+                        $"{localization["Renaming"]}",
                         item.Name);
                 });
 
@@ -338,7 +371,7 @@ namespace CourseProgect_1._2.ViewModels
 
                 if (exists)
                 {
-                    MessageBox.Show("Файл или папка с таким именем уже существует", "Ошибка",
+                    MessageBox.Show(localization["A file or folder with that name already exists"], localization["Error"],
                                   MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
@@ -366,12 +399,12 @@ namespace CourseProgect_1._2.ViewModels
                     RefreshTreeView();
                 });
 
-                MessageBox.Show($"'{item.Name}' переименован в '{newName}'", "Успех",
+                MessageBox.Show($"'{item.Name}' {localization["renamed to"]} '{newName}'", localization["Success"],
                               MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при переименовании: {ex.Message}", "Ошибка",
+                MessageBox.Show($"{localization["Error when renaming"]}: {ex.Message}", localization["Error"],
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -603,7 +636,7 @@ namespace CourseProgect_1._2.ViewModels
             catch (Exception ex)
             {
 
-                MessageBox.Show($"Ошибка при сохранении {item.TitleName}: {ex.Message}", "Ошибка",
+                MessageBox.Show($"{localization["Error when saving"]} {item.TitleName}: {ex.Message}", localization["Error"],
                                MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -621,7 +654,6 @@ namespace CourseProgect_1._2.ViewModels
         #endregion
         private void RemoveItemFromTree(FileSystemItem itemToDelete)
         {
-            // Ищем родительский элемент в корневых элементах
             foreach (var rootItem in FileSystemItems)
             {
                 if (RemoveFromChildren(rootItem, itemToDelete))
@@ -633,17 +665,15 @@ namespace CourseProgect_1._2.ViewModels
 
         private bool RemoveFromChildren(FileSystemItem parent, FileSystemItem itemToDelete)
         {
-            // Проверяем прямых детей
             if (parent.Children?.Contains(itemToDelete) == true)
             {
                 parent.Children.Remove(itemToDelete);
                 return true;
             }
 
-            // Рекурсивно проверяем детей
             if (parent.Children != null)
             {
-                foreach (var child in parent.Children.ToList()) // ToList() для избежания модификации во время итерации
+                foreach (var child in parent.Children.ToList()) 
                 {
                     if (RemoveFromChildren(child, itemToDelete))
                     {
@@ -876,7 +906,6 @@ namespace CourseProgect_1._2.ViewModels
             if (items.Remove(fileItem))
                 return true;
 
-            // Рекурсивный поиск в детях
             foreach (var item in items)
             {
                 if (item.Children != null && DeleteFileSystemItem(fileItem, item.Children))
@@ -891,10 +920,8 @@ namespace CourseProgect_1._2.ViewModels
         {
             if (items == null) return;
 
-            // Создаем временный список для сортировки
             var itemsList = items.ToList();
 
-            // Сортируем с учетом типа (папки/файлы)
             itemsList.Sort((x, y) =>
             {
                 if (x.IsDirectory && !y.IsDirectory) return -1;
@@ -902,7 +929,6 @@ namespace CourseProgect_1._2.ViewModels
                 return string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
             });
 
-            // Перемещаем элементы в правильном порядке
             for (int i = 0; i < itemsList.Count; i++)
             {
                 var currentItem = itemsList[i];
@@ -913,15 +939,30 @@ namespace CourseProgect_1._2.ViewModels
                     items.Move(currentIndex, i);
                 }
 
-                // Рекурсивно сортируем детей
                 if (currentItem.IsDirectory && currentItem.Children != null)
                 {
                     SorterNameSystemFile(currentItem.Children);
                 }
             }
         }
+        #region ChangeLanguageCommand
+        public ICommand? ChangeLanguageCommand { get; set; }
+        private bool CanChangeLanguageCommandExecuted(object par) => true;
+        public void OnChangeLanguageCommandExecuted(object par)
+        {
+            if (par is not string item) return;
+
+            ChangeLanguage(item);
+            localization.OverwriteFile("LanguageCustomization.config", item);
+        }
+        public void ChangeLanguage(string languageName)
+        {
+            localization.CurrentLanguage = languageName;
+        }
+        #endregion
         public EW_ViewModel()
         {
+            localization.LanguageChanged += OnLanguageChanged;
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
             DeleteCommand = new LambdaCommand(OnDeleteCommandExecuted, CanDeleteCommandExecuted);
             RenameCommand = new LambdaCommand(OnRenameCommandExecuted, CanRenameCommandExecuted);
@@ -943,6 +984,7 @@ namespace CourseProgect_1._2.ViewModels
             TabDropTabItem = new LambdaCommand(OnTabDropTabItemExecuted, CanTabDropTabItemExecuted);
             DragTreeItem = new LambdaCommand(OnDragTreeItemExecuted, CanDragTreeItemExecuted);
             DropTreeItem = new LambdaCommand(OnDropTreeItemExecuted, CanDropTreeItemExecuted);
+            ChangeLanguageCommand = new LambdaCommand(OnChangeLanguageCommandExecuted, CanChangeLanguageCommandExecuted);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
+using CourseProgect_1._2.services.Localization;
 using CourseProgect_1._2.ViewModels.Base;
 using Microsoft.Win32;
 using System.Windows;
@@ -11,14 +12,27 @@ namespace CourseProgect_1._2.viewmodels
     /// </summary>
     internal class WFEPN_ViewModel : ViewModel
     {
+        ALocalization localization = new ALocalization();
+
+        public string StringProjectName => localization["Project Name"];
+        public string StringProjectPath => localization["Project Path"];
+        public string StringCalcer => localization["Calcer"];
+        public string StringOk => localization["Ok"];
+        private void OnLanguageChanged()
+        {
+            OnPropertyChanged(nameof(StringProjectName));
+            OnPropertyChanged(nameof(StringProjectPath));
+            OnPropertyChanged(nameof(StringCalcer));
+            OnPropertyChanged(nameof(StringOk));
+        }
         #region Содержимое TextBox
-        private string _TextBox_NameProgect = "Название Проекта";
+        private string _TextBox_NameProgect;
         public string TextBox_NameProgect
         {
             get => _TextBox_NameProgect;
             set => Set(ref _TextBox_NameProgect, value);
         }
-        private string _TextBox_PathProgect = "Путь Проекта";
+        private string _TextBox_PathProgect;
         public string TextBox_PathProgect
         {
             get => _TextBox_PathProgect;
@@ -52,7 +66,7 @@ namespace CourseProgect_1._2.viewmodels
             {
                 var dialog = new OpenFolderDialog
                 {
-                    Title = "Выберите папку",
+                    Title = localization["Select a folder"],
                     Multiselect = false
                 };
                 if (dialog.ShowDialog() == true)
@@ -74,9 +88,9 @@ namespace CourseProgect_1._2.viewmodels
         private bool CanClickOkExecuted(object par) => true;
         public void OnClickOkExecuted(object par)
         {
-            if (_TextBox_NameProgect == "Название Проекта")
+            if (_TextBox_NameProgect == "")
             {
-                MessageBox.Show("Введите имя проекта");
+                MessageBox.Show(localization["Enter the project name"]);
             }
             if (Motion == true)
             {

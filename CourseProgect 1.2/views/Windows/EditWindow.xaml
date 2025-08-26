@@ -32,16 +32,22 @@
                         />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Файл" Grid.Column="0">
-                    <MenuItem Header="Открыть проект"
+                <MenuItem Header="{Binding StringFile}" Grid.Column="0">
+                    <MenuItem Header="{Binding StringOpenAProject}"
                          Command="{Binding OpenMainWindowCommand}"
                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
-                    <MenuItem Header="Сохранить все"
+                    <MenuItem Header="{Binding StringSaveEverything}"
                               Command="{Binding SaveAllCommand}"/>
-                    <MenuItem Header="Сохранить"
+                    <MenuItem Header="{Binding StringSave}"
                               Command="{Binding SaveActiveaTabItemCommand}"/>
                 </MenuItem>
-
+                <MenuItem Header="{Binding StringLanguage}" ItemsSource="{Binding loc}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <MenuItem Header="{Binding}" Click="MenuItem_Click"/>
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
             </Menu>
             <Menu Grid.Column="1" HorizontalAlignment="Right">
                 <MenuItem Margin="2,0,2,0" 
@@ -70,7 +76,7 @@
                 <TreeView Margin="6,6,10,6" ItemsSource="{Binding FileSystemItems}">
                     <TreeView.Resources>
                         <ContextMenu x:Key="ItemContextMenu">
-                            <MenuItem Header="Открыть" 
+                            <MenuItem Header="{Binding DataContext.StringOpen, RelativeSource={RelativeSource AncestorType=Window}}"
                       Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
                       CommandParameter="{Binding}">
                                 
@@ -85,7 +91,7 @@
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
-                            <MenuItem Header="Создать файл" 
+                            <MenuItem Header="{Binding DataContext.StringCreateAFile, RelativeSource={RelativeSource AncestorType=Window}}" 
 Command="{Binding DataContext.ToСreateFileCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
 CommandParameter="{Binding}">
                                 <MenuItem.Style>
@@ -99,7 +105,7 @@ CommandParameter="{Binding}">
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
-                            <MenuItem Header="Создать папку" 
+                            <MenuItem Header="{Binding DataContext.StringCreateAFolder, RelativeSource={RelativeSource AncestorType=Window}}" 
 Command="{Binding DataContext.ToСreateDirectoryCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
 CommandParameter="{Binding}">
                                 <MenuItem.Style>
@@ -113,10 +119,10 @@ CommandParameter="{Binding}">
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
-                            <MenuItem Header="Пеоеименовать" 
+                            <MenuItem Header="{Binding DataContext.StringRename, RelativeSource={RelativeSource AncestorType=Window}}" 
 Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
 CommandParameter="{Binding}"/>
-                            <MenuItem Header="Удалить" 
+                            <MenuItem Header="{Binding DataContext.StringDelete, RelativeSource={RelativeSource AncestorType=Window}}" 
                       Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
                       CommandParameter="{Binding}"/>
                         </ContextMenu>

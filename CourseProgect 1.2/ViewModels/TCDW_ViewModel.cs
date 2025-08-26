@@ -1,5 +1,6 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.models;
+using CourseProgect_1._2.services.Localization;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
 using System;
@@ -16,6 +17,9 @@ namespace CourseProgect_1._2.ViewModels
 {
     class TCDW_ViewModel : ViewModel
     {
+
+        ALocalization localization = new ALocalization();
+
         private FileSystemItem Directory;
         private string _NameDirectory;
         private bool _Closer;
@@ -29,6 +33,15 @@ namespace CourseProgect_1._2.ViewModels
         {
             Directory = TreeView;
             ToСreateDirectoryCommand = new LambdaCommand(OnToСreateDirectoryCommandExecuted, CanToСreateDirectoryCommandExecuted);
+        }
+        public string StringFolderName => localization["Folder Name"];
+        public string StringCalcer => localization["Calcer"];
+        public string StringToCreate => localization["To create"];
+        private void OnLanguageChanged()
+        {
+            OnPropertyChanged(nameof(StringFolderName));
+            OnPropertyChanged(nameof(StringCalcer));
+            OnPropertyChanged(nameof(StringToCreate));
         }
         public bool CanCreateDirectory() { return !string.IsNullOrEmpty(_NameDirectory) && !_NameDirectory.Intersect(System.IO.Path.GetInvalidFileNameChars()).Any(); }
 
@@ -55,13 +68,13 @@ namespace CourseProgect_1._2.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Ошибка создания файла",
+                    MessageBox.Show(ex.Message, localization["File creation error"],
                      MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Closer = false;
                 }
             }
             Closer = false;
-            MessageBox.Show("Данные некорректные данные", "Ошибка создания файла",
+            MessageBox.Show(localization["The data is incorrect"], localization["File creation error"],
                       MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         #endregion

@@ -13,7 +13,6 @@ namespace CourseProgect_1._2.infrastructure.Converter
                 values[0] is ICommand openCommand &&
                 values[1] is FileSystemItem item)
             {
-                // Проверяем, что это файл (не директория)
                 if (!item.IsDirectory && openCommand.CanExecute(item))
                 {
                     openCommand.Execute(item);
