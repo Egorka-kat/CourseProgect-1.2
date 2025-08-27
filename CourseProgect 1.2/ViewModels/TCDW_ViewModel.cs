@@ -64,6 +64,7 @@ namespace CourseProgect_1._2.ViewModels
                             IsDirectory = true
                         }
                     );
+                    Closer = true;
                     return;
                 }
                 catch (Exception ex)

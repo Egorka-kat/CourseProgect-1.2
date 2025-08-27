@@ -21,7 +21,7 @@
                 <ColumnDefinition Width="20*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Menu HorizontalAlignment="Left" Grid.Column="0">
+            <Menu HorizontalAlignment="Left" Grid.Column="0" Background="White">
                 <MenuItem Margin="2,0,2,0"
             Command="{Binding ClosingTreeView}" 
                   CommandParameter="{Binding ElementName=Col1}">
@@ -49,7 +49,7 @@
                     </MenuItem.ItemTemplate>
                 </MenuItem>
             </Menu>
-            <Menu Grid.Column="1" HorizontalAlignment="Right">
+            <Menu Grid.Column="1" HorizontalAlignment="Right" Background="White">
                 <MenuItem Margin="2,0,2,0" 
                 Command="{Binding ClosingWebView}" 
                 CommandParameter="{Binding ElementName=Col3}"

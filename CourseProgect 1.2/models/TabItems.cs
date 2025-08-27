@@ -321,7 +321,7 @@ namespace CourseProgect_1._2.models
                 ".cs" => HighlightingManager.Instance.GetDefinition("C#"),
                 ".html" or ".htm" => HighlightingManager.Instance.GetDefinition("HTML"),
                 ".xml" => HighlightingManager.Instance.GetDefinition("XML"),
-                ".js" => HighlightingManager.Instance.GetDefinition("JavaScript"),
+                ".js" or ".json"  => HighlightingManager.Instance.GetDefinition("JavaScript"),
                 ".sql" => HighlightingManager.Instance.GetDefinition("SQL"),
                 ".css" => HighlightingManager.Instance.GetDefinition("CSS"),
                 ".py" => HighlightingManager.Instance.GetDefinition("Python"),
@@ -352,7 +352,7 @@ namespace CourseProgect_1._2.models
         {
             try
             {
-                return System.IO.File.ReadAllText(Path, Encoding.UTF8);
+                return System.IO.File.ReadAllText(Path);
             }
             catch (Exception ex)
             {

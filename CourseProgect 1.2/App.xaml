@@ -10,7 +10,6 @@
         <FontFamily x:Key="FontAwesome">pack://application:,,,/FontAwesome.WPF;component/#FontAwesome</FontFamily>
         <con:OpenCommandConverter x:Key="OpenCommandConverter"/>
         <ser:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <!-- Конвертер иконок -->
         <ser:IconConverter x:Key="IconConverter"/>
         <ser:EnumToBoolConverter x:Key="EnumToBoolConverter"/>
         

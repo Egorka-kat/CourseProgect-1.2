@@ -63,16 +63,6 @@ namespace CourseProgect_1._2.ViewModels
                                 continue;
                             }
 
-                            string xmlName = xRoot.SelectSingleNode("Name")?.InnerText ?? "";
-                            string xmlPath = xRoot.SelectSingleNode("Path")?.InnerText ?? "";
-                            string xmlLastCallDate = xRoot.SelectSingleNode("Last_call_date")?.InnerText ?? "";
-
-                            if (item.Name == xmlName &&
-                                item.Path == xmlPath &&
-                                item.Last_call_date == xmlLastCallDate)
-                            {
-                                item.Last_call_date = DateTime.Now.ToString("G");
-                            }
                         }
                         catch (Exception ex)
                         {
@@ -87,13 +77,9 @@ namespace CourseProgect_1._2.ViewModels
                         db.SaveChanges();
                     }
                 }
-                var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
-                    var editor = new EditWindow(System.IO.Path.GetDirectoryName(_Progect.Path));
-                    currentWindow?.Close();
-                    editor.Show();
-                }
-
             }
+
+        }
         #endregion
 
         #region Заголовок окна
@@ -172,10 +158,75 @@ namespace CourseProgect_1._2.ViewModels
                         }
                     }
                 }
-                Progect progect = new Progect(System.IO.Path.GetFileNameWithoutExtension(selectedFile), selectedFile, DateTime.Now.ToString("d"));
+                Progect progect = new Progect(System.IO.Path.GetFileNameWithoutExtension(selectedFile), selectedFile, DateTime.Now.ToString("G"));
                 db.Progects.Add(progect);
                 db.SaveChanges();
                 OpenMainWindow(System.IO.Path.GetDirectoryName(progect.Path), par);
+            }
+        }
+        #endregion
+
+        #region CommandOpenProgramm
+        public ICommand? CommandOpenProgramm { get; set; }
+        private bool CanCommandOpenProgrammExecuted(object par) => true;
+        public void OnCommandOpenProgrammExecuted(object par)
+        {
+            if (_Progect.Path is not null)
+            {
+                var itemsToRemove = new List<Progect>();
+
+                foreach (var item in db.Progects)
+                {
+                    try
+                    {
+                        if (!File.Exists(item.Path))
+                        {
+                            itemsToRemove.Add(item);
+                            continue;
+                        }
+
+                        XmlDocument xDoc = new XmlDocument();
+                        xDoc.Load(item.Path);
+                        XmlElement xRoot = xDoc.DocumentElement;
+
+                        if (xRoot == null || xRoot.Name != "Progect")
+                        {
+                            itemsToRemove.Add(item);
+                            continue;
+                        }
+
+                        string xmlName = xRoot.SelectSingleNode("Name")?.InnerText ?? "";
+                        string xmlPath = xRoot.SelectSingleNode("Path")?.InnerText ?? "";
+                        var xmlLastCallDate = xRoot.SelectSingleNode("Last_call_date") ?? xRoot.AppendChild(xRoot.OwnerDocument.CreateElement("Last_call_date"));
+
+                        if (item.Name == xmlName &&
+                            item.Path == xmlPath)
+                        {
+                            item.Last_call_date = DateTime.Now.ToString("G");
+                            xmlLastCallDate.InnerText = DateTime.Now.ToString("G");
+                            xRoot.OwnerDocument.Save(item.Path);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        itemsToRemove.Add(item);
+                    }
+                }
+
+                // Удаляем и сохраняем
+                if (itemsToRemove.Any())
+                {
+                    db.Progects.RemoveRange(itemsToRemove);
+                    db.SaveChanges();
+                    return;
+                }
+                db.SaveChanges();
+
+                var currentWindow = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive);
+                var editor = new EditWindow(System.IO.Path.GetDirectoryName(_Progect.Path));
+                currentWindow?.Close();
+
+                editor.Show();
             }
         }
         #endregion
@@ -216,6 +267,9 @@ namespace CourseProgect_1._2.ViewModels
             #endregion
             #region CommandExportNewProgect
             CommandExportNewProgect = new LambdaCommand(OnCommandExportNewProgectExecuted, CanCommandExportNewProgectExecuted);
+            #endregion
+            #region CommandOpenProgramm
+            CommandOpenProgramm = new LambdaCommand(OnCommandOpenProgrammExecuted, CanCommandOpenProgrammExecuted);
             #endregion
             #endregion
         }

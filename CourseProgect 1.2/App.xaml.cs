@@ -15,6 +15,7 @@ namespace CourseProgect_1._2
    
     public partial class App : Application
     {
+
     }
     
 }

@@ -343,6 +343,12 @@ namespace CourseProgect_1._2.ViewModels
         {
             if (par is not FileSystemItem item) return;
 
+
+            if (!File.Exists(item.FullPath))
+            {
+                RemoveItemFromTree(item);
+                return;
+            }
             try
             {
                 string newName = await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
@@ -533,6 +539,11 @@ namespace CourseProgect_1._2.ViewModels
         {
             if (par is not FileSystemItem item || item.IsDirectory == true) return;
 
+            if (!File.Exists(item.FullPath))
+            {
+                RemoveItemFromTree(item);
+                return;
+            }
             try
             {
                 TabSystemItem tabSystemItem = new TabSystemItem(item.Name, item.FullPath);

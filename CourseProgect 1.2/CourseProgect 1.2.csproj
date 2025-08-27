@@ -22,7 +22,6 @@
     <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
     <PackageReference Include="Markdig.Wpf" Version="0.5.0.1" />
-    <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3405.78" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.8" />
@@ -39,10 +38,8 @@
 			<AllLanguageFiles Include="$(ProjectDir)Language\**\*.*" />
 		</ItemGroup>
 
-		<Copy SourceFiles="@(AllLanguageFiles)"
-			  DestinationFiles="@(AllLanguageFiles->'$(OutputPath)Language\%(RecursiveDir)%(Filename)%(Extension)')"
-			  SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(AllLanguageFiles)" DestinationFiles="@(AllLanguageFiles->'$(OutputPath)Language\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 
-		<Message Text="Скопировано файлов: @(AllLanguageFiles->Count())" Importance="high" />
+		<Message Text="Скопировано файлов: @(AllLanguageFiles-&gt;Count())" Importance="high" />
 	</Target>
 </Project>
