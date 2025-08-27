@@ -2,6 +2,7 @@
   "Русский язык": {
     "Are you sure you want to delete": "Вы уверены, что хотите удалить",
     "A file or folder with that name already exists": "Файл или папка с таким именем уже существуют",
+	"The file or folder does not exist": "Файл или папка не существует",
     "Another...": "Другой...",
     "Calcer": "Отмена",
     "Confirmation of deletion": "Подтверждение удаления",
@@ -46,6 +47,7 @@
     "the folder": "папку",
 	"Language": "Язык",
 	"Open" : "Открыть",
-	"Folder Name" : "Имя папки:"
+	"Folder Name" : "Имя папки:",
+	"Open in File Explorer" : "Открыть в проводнике"
   }
 }

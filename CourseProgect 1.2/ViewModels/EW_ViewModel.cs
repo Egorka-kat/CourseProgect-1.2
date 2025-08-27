@@ -8,6 +8,7 @@ using FontAwesome.WPF;
 using ICSharpCode.AvalonEdit.Search;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,19 +18,23 @@ namespace CourseProgect_1._2.ViewModels
 {
     class EW_ViewModel : ViewModel
     {
-        ALocalization localization = new ALocalization();
-        public ObservableCollection<string> loc
-        {
-            get => localization.language;
-            set { Set(ref localization.language, value);  }
-        }
+        #region Переменные для TreeView
         public ObservableCollection<FileSystemItem> FileSystemItems { get; set; } = new ObservableCollection<FileSystemItem>();
+        private FileSystemItem DragFileItem;
+        #endregion
+        #region Переменные для TabControl
         public ObservableCollection<TabSystemItem> TabItems { get; set; } = new ObservableCollection<TabSystemItem> 
         { };
         private TabSystemItem _ActiveaTabSystemItem;
-        private FileSystemItem DragFileItem;
         private TabSystemItem DragTabItem;
+        #endregion
         #region перевод
+        static ALocalization localization = new ALocalization();
+        public ObservableCollection<string> loc
+        {
+            get => localization.language;
+            set { Set(ref localization.language, value); }
+        }
         public string StringFile => localization["File"];
         public string StringOpenAProject => localization["Open a project"];
         public string StringSaveEverything => localization["Save everything"];
@@ -40,6 +45,7 @@ namespace CourseProgect_1._2.ViewModels
         public string StringOpen => localization["Open"];
         public string StringCreateAFile => localization["Create a file"];
         public string StringCreateAFolder => localization["Create a folder"];
+        public string StringOpenInFileExplorer => localization["Open in File Explorer"];
         public string StringRename => localization["Rename"];
         public string StringDelete => localization["Delete"];
         private void OnLanguageChanged()
@@ -56,11 +62,13 @@ namespace CourseProgect_1._2.ViewModels
             OnPropertyChanged(nameof(StringOpen));
             OnPropertyChanged(nameof(StringCreateAFile));
             OnPropertyChanged(nameof(StringCreateAFolder));
+            OnPropertyChanged(nameof(StringOpenInFileExplorer));
             OnPropertyChanged(nameof(StringRename));
             OnPropertyChanged(nameof(StringDelete));
             #endregion
         }
         #endregion
+
         public bool isClosed = true;
         public TabSystemItem ActiveaTabSystemItem
         {
@@ -72,17 +80,6 @@ namespace CourseProgect_1._2.ViewModels
             }
         }
 
-        private GridLength _ColumnWigth = new GridLength(200);
-        public GridLength ColumnWigth
-        {
-            get => _ColumnWigth;
-            set
-            {
-                _ColumnWigth = value;
-                OnPropertyChanged("ColumnWigth");
-            }
-        }
-        private GridLength FixedWidth;
         private string _LoadPath;
         public string LoadPath
         {
@@ -113,7 +110,6 @@ namespace CourseProgect_1._2.ViewModels
 
             var directoryInfo = new DirectoryInfo(path);
             NameProgect = directoryInfo.Name;
-            // Создаем корневой узел
             var rootItem = new FileSystemItem
             {
                 Name = directoryInfo.Name,
@@ -124,7 +120,6 @@ namespace CourseProgect_1._2.ViewModels
 
             FileSystemItems.Add(rootItem);
 
-            // Загружаем содержимое корневой папки
             LoadSubdirectories(rootItem);
         }
 
@@ -147,7 +142,6 @@ namespace CourseProgect_1._2.ViewModels
                     };
 
                     parentItem.Children.Add(item);
-                    // Рекурсивно загружаем вложенные папки (по необходимости)
                     LoadSubdirectories(item);
                 }
 
@@ -189,9 +183,11 @@ namespace CourseProgect_1._2.ViewModels
                 OnPropertyChanged(nameof(PanelIcon));
             }
         }
-        
+
         public FontAwesomeIcon PanelIcon =>
             IsPanelClosed ? FontAwesomeIcon.AngleDoubleLeft : FontAwesomeIcon.AngleDoubleRight;
+
+        private GridLength FixedWidth;
         public ICommand? ClosingTreeView { get; set; }
         private bool CanClosingTreeViewExecuted(object par) => true;
         public void OnClosingTreeViewExecuted(object par)
@@ -349,7 +345,6 @@ namespace CourseProgect_1._2.ViewModels
 
             try
             {
-                // Используем VisualBasic InputBox
                 string newName = await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     return Microsoft.VisualBasic.Interaction.InputBox(
@@ -376,7 +371,6 @@ namespace CourseProgect_1._2.ViewModels
                     return;
                 }
 
-                // Переименование
                 await Task.Run(() =>
                 {
                     if (item.IsDirectory)
@@ -440,27 +434,22 @@ namespace CourseProgect_1._2.ViewModels
         {
             if (item.IsDirectory)
             {
-                // Проверяем существует ли директория
                 if (!Directory.Exists(item.FullPath))
                 {
-                    // Удаляем несуществующий элемент
                     RemoveItemFromTree(item);
                     return;
                 }
 
-                // Обновляем детей директории
                 RefreshDirectoryChildren(item);
             }
             else
             {
-                // Проверяем существует ли файл
                 if (!File.Exists(item.FullPath))
                 {
                     RemoveItemFromTree(item);
                     return;
                 }
 
-                // Обновляем информацию о файле
                 var fileInfo = new FileInfo(item.FullPath);
                 item.Name = fileInfo.Name;
                 OnPropertyChanged(nameof(item.Name));
@@ -474,13 +463,11 @@ namespace CourseProgect_1._2.ViewModels
 
             try
             {
-                // Получаем текущие файлы и папки
                 var currentDirs = Directory.GetDirectories(directory.FullPath);
                 var currentFiles = Directory.GetFiles(directory.FullPath);
 
                 var currentPaths = currentDirs.Concat(currentFiles).ToHashSet();
 
-                // Удаляем несуществующие элементы
                 for (int i = directory.Children.Count - 1; i >= 0; i--)
                 {
                     var child = directory.Children[i];
@@ -490,7 +477,6 @@ namespace CourseProgect_1._2.ViewModels
                     }
                 }
 
-                // Добавляем новые элементы
                 foreach (var dirPath in currentDirs)
                 {
                     if (!directory.Children.Any(c => c.FullPath == dirPath))
@@ -520,7 +506,6 @@ namespace CourseProgect_1._2.ViewModels
                     }
                 }
 
-                // Рекурсивно обновляем детей
                 foreach (var child in directory.Children.Where(c => c.IsDirectory))
                 {
                     RefreshFileSystemItem(child);
@@ -528,11 +513,19 @@ namespace CourseProgect_1._2.ViewModels
             }
             catch (UnauthorizedAccessException)
             {
-                // Пропускаем директории без доступа
             }
         }
         #endregion
-
+        #region OpenExplorer
+        public ICommand? OpenExplorer { get; set; }
+        private bool CanOpenExplorerExecuted(object par) => true;
+        public void OnOpenExplorerExecuted(object par)
+        {
+            if (par is not FileSystemItem item) return;
+            OpenFileLocation(item.FullPath);
+            SorterNameSystemFile(FileSystemItems);
+        }
+        #endregion
         #region OpenCommand
         public ICommand? OpenCommand { get; set; }
         private bool CanOpenCommandExecuted(object par) => true;
@@ -580,6 +573,7 @@ namespace CourseProgect_1._2.ViewModels
             return false;
         }
         #endregion
+        #region SaveToClosed
         public ICommand? SaveToClosed { get; set; }
         private bool CanSaveToClosedExecuted(object par) => true;
         public void OnSaveToClosedExecuted(object par)
@@ -602,6 +596,7 @@ namespace CourseProgect_1._2.ViewModels
                 else isClosed = false;
             }
         }
+        #endregion
         #region CloseTabCommand
         public ICommand? CloseTabCommand { get; set; }
         private bool CanCloseTabCommandExecuted(object par) => true;
@@ -652,58 +647,6 @@ namespace CourseProgect_1._2.ViewModels
             }
         }
         #endregion
-        private void RemoveItemFromTree(FileSystemItem itemToDelete)
-        {
-            foreach (var rootItem in FileSystemItems)
-            {
-                if (RemoveFromChildren(rootItem, itemToDelete))
-                {
-                    return;
-                }
-            }
-        }
-
-        private bool RemoveFromChildren(FileSystemItem parent, FileSystemItem itemToDelete)
-        {
-            if (parent.Children?.Contains(itemToDelete) == true)
-            {
-                parent.Children.Remove(itemToDelete);
-                return true;
-            }
-
-            if (parent.Children != null)
-            {
-                foreach (var child in parent.Children.ToList()) 
-                {
-                    if (RemoveFromChildren(child, itemToDelete))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private FileSystemItem FindParent(FileSystemItem current, FileSystemItem target)
-        {
-            if (current.Children.Contains(target))
-            {
-                return current;
-            }
-
-            foreach (var child in current.Children)
-            {
-                var parent = FindParent(child, target);
-                if (parent != null)
-                {
-                    return parent;
-                }
-            }
-
-            return null;
-        }
-
         #region TextChangedCommand
         public ICommand? TextChangedCommand { get; set; }
         private bool CanTextChangedCommandExecuted(object par) => true;
@@ -916,6 +859,22 @@ namespace CourseProgect_1._2.ViewModels
 
         }
         #endregion
+        #region ChangeLanguageCommand
+        public ICommand? ChangeLanguageCommand { get; set; }
+        private bool CanChangeLanguageCommandExecuted(object par) => true;
+        public void OnChangeLanguageCommandExecuted(object par)
+        {
+            if (par is not string item) return;
+
+            ChangeLanguage(item);
+            localization.OverwriteFile("LanguageCustomization.config", item);
+        }
+        public void ChangeLanguage(string languageName)
+        {
+            localization.CurrentLanguage = languageName;
+        }
+        #endregion
+
         private void SorterNameSystemFile(ObservableCollection<FileSystemItem> items)
         {
             if (items == null) return;
@@ -945,27 +904,82 @@ namespace CourseProgect_1._2.ViewModels
                 }
             }
         }
-        #region ChangeLanguageCommand
-        public ICommand? ChangeLanguageCommand { get; set; }
-        private bool CanChangeLanguageCommandExecuted(object par) => true;
-        public void OnChangeLanguageCommandExecuted(object par)
+        private void RemoveItemFromTree(FileSystemItem itemToDelete)
         {
-            if (par is not string item) return;
+            foreach (var rootItem in FileSystemItems)
+            {
+                if (RemoveFromChildren(rootItem, itemToDelete))
+                {
+                    return;
+                }
+            }
+        }
+        private bool RemoveFromChildren(FileSystemItem parent, FileSystemItem itemToDelete)
+        {
+            if (parent.Children?.Contains(itemToDelete) == true)
+            {
+                parent.Children.Remove(itemToDelete);
+                return true;
+            }
 
-            ChangeLanguage(item);
-            localization.OverwriteFile("LanguageCustomization.config", item);
+            if (parent.Children != null)
+            {
+                foreach (var child in parent.Children.ToList())
+                {
+                    if (RemoveFromChildren(child, itemToDelete))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
-        public void ChangeLanguage(string languageName)
+        private FileSystemItem FindParent(FileSystemItem current, FileSystemItem target)
         {
-            localization.CurrentLanguage = languageName;
+            if (current.Children.Contains(target))
+            {
+                return current;
+            }
+
+            foreach (var child in current.Children)
+            {
+                var parent = FindParent(child, target);
+                if (parent != null)
+                {
+                    return parent;
+                }
+            }
+
+            return null;
         }
-        #endregion
+        public static void OpenFileLocation(string filePath)
+        {
+            if (File.Exists(filePath) || Directory.Exists(filePath))
+            {
+                try
+                {
+                    // Открываем папку и выделяем файл
+                    Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"{localization["Error"]}: {ex.Message}");
+                }
+            }
+            else
+            {
+                MessageBox.Show(localization["The file or folder does not exist"]);
+            }
+        }
         public EW_ViewModel()
         {
             localization.LanguageChanged += OnLanguageChanged;
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
             DeleteCommand = new LambdaCommand(OnDeleteCommandExecuted, CanDeleteCommandExecuted);
             RenameCommand = new LambdaCommand(OnRenameCommandExecuted, CanRenameCommandExecuted);
+
+            OpenExplorer = new LambdaCommand(OnOpenExplorerExecuted, CanOpenExplorerExecuted);
             OpenCommand = new LambdaCommand(OnOpenCommandExecuted, CanOpenCommandExecuted);
             CloseTabCommand = new LambdaCommand(OnCloseTabCommandExecuted, CanCloseTabCommandExecuted);
             ClosingWebView = new LambdaCommand(OnClosingWebViewExecuted, CanClosingWebViewExecuted);

@@ -26,7 +26,6 @@ namespace CourseProgect_1._2.services.Localization
                 if (localizationData == null || localizationData.Count == 0)
                     throw new InvalidOperationException("Не удалось десериализовать JSON файл или файл пуст");
 
-                // Берем первый доступный язык
                 var firstLanguage = localizationData.First().Value;
                 return new Dictionary<string, string>(firstLanguage);
             }

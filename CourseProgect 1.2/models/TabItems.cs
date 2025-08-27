@@ -36,15 +36,14 @@ namespace CourseProgect_1._2.models
             {
                 if (Set(ref _IsMd, value))
                 {
-                    OnPropertyChanged(nameof(UriPath)); // Если UriPath зависит от IsMd
+                    OnPropertyChanged(nameof(UriPath)); 
                 }
             }
         }
         private Uri ConvertToDataUri(string markdownText)
         {
             string htmlContent = Markdig.Markdown.ToHtml(markdownText);
-
-            // Создаем полный HTML документ со стилями
+            #region html
             string fullHtml = $@"
     <!DOCTYPE html>
     <html lang='ru'>
@@ -233,8 +232,7 @@ namespace CourseProgect_1._2.models
         </script>
     </body>
     </html>";
-
-            // Конвертируем в base64
+            #endregion
             byte[] bytes1 = Encoding.UTF8.GetBytes(htmlContent);
             string base64Content1 = Convert.ToBase64String(bytes1);
             string dataUrl1 = $"data:text/html;base64,{base64Content1}";
@@ -249,25 +247,14 @@ namespace CourseProgect_1._2.models
 
                 try
                 {
-                    if (IsMd && System.IO.Path.GetExtension(Path).ToLower() == ".md")
+                    if (System.IO.Path.GetExtension(Path).ToLower() == ".html")
                     {
-                        // Для MD файлов
-                        string htmlContent = Markdig.Markdown.ToHtml(Text);
-                        // ... ваш код для MD ...
-                        byte[] bytes = Encoding.UTF8.GetBytes(htmlContent);
-                        string base64Content = Convert.ToBase64String(bytes);
-                        return new Uri($"data:text/html;base64,{base64Content}");
-                    }
-                    else if (System.IO.Path.GetExtension(Path).ToLower() == ".html")
-                    {
-                        // Для HTML файлов
                         byte[] bytes = Encoding.UTF8.GetBytes(Text);
                         string base64Content = Convert.ToBase64String(bytes);
                         return new Uri($"data:text/html;base64,{base64Content}");
                     }
                     else
                     {
-                        // Для обычных текстовых файлов
                         string formattedText = Text.Replace("&", "&amp;")
                             .Replace("<", "&lt;")
                             .Replace(">", "&gt;")
@@ -327,7 +314,6 @@ namespace CourseProgect_1._2.models
 
             var extension = System.IO.Path.GetExtension(Path).ToLower();
 
-            // ✅ Используем свойство с Set() методом
             IsMd = (extension == ".md");
 
             SyntaxHighlighting = extension switch
@@ -356,11 +342,9 @@ namespace CourseProgect_1._2.models
             Document = new TextDocument();
             Document.TextChanged += (s, e) =>
             {
-                // Обновляем строковое свойство при изменении документа
                 Text = Document.Text;
             };
 
-            // Инициализация начальным текстом
             Text = ReadFile();
         }
 

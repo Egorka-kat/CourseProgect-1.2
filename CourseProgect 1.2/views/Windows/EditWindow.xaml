@@ -119,6 +119,9 @@ CommandParameter="{Binding}">
                                     </Style>
                                 </MenuItem.Style>
                             </MenuItem>
+                            <MenuItem Header="{Binding DataContext.StringOpenInFileExplorer, RelativeSource={RelativeSource AncestorType=Window}}" 
+Command="{Binding DataContext.OpenExplorer, RelativeSource={RelativeSource AncestorType=TreeView}}"
+CommandParameter="{Binding}"/>
                             <MenuItem Header="{Binding DataContext.StringRename, RelativeSource={RelativeSource AncestorType=Window}}" 
 Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
 CommandParameter="{Binding}"/>

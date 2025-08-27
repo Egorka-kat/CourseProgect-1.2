@@ -2,7 +2,8 @@
   "Deutsch": {
     "Are you sure you want to delete": "Sind Sie sicher, dass Sie löschen möchten",
     "A file or folder with that name already exists": "Eine Datei oder ein Ordner mit diesem Namen existiert bereits",
-    "Another...": "Andere...",
+    "The file or folder does not exist": "Die Datei oder der Ordner ist nicht vorhanden",
+	"Another...": "Andere...",
     "Calcer": "Abbrechen",
     "Confirmation of deletion": "Löschbestätigung",
     "Create a file": "Datei erstellen",
@@ -46,6 +47,7 @@
     "the folder": "Ordner",
 	"Language": "Sprache",
 	"Open" : "Öffnen",
-	"Folder Name" : "Ordnername:"
+	"Folder Name" : "Ordnername:",
+	"Open in File Explorer" : "Im Explorer öffnen"
   }
 }

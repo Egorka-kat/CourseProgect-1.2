@@ -6,22 +6,77 @@
         xmlns:local="clr-namespace:Test"
        xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
         Title="Simple MD Viewer" 
-        Height="500" 
-        Width="700"
-        WindowStartupLocation="CenterScreen">
+         Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-    <DockPanel>
-        <!-- Кнопка открытия файла -->
-        <Button DockPanel.Dock="Top" 
-                Content="Open MD File" 
-                Click="OpenButton_Click"
-                Margin="10" 
-                Padding="10,5"
-                HorizontalAlignment="Left"/>
+        <!-- Панель управления -->
+        <Border Grid.Row="0" Background="{DynamicResource CardBrush}" Padding="16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Тёмная тема" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ToggleButton x:Name="ThemeToggleButton" Style="{StaticResource ThemeToggleButtonStyle}"
+                              Checked="ThemeToggleButton_Checked" Unchecked="ThemeToggleButton_Unchecked"/>
+            </StackPanel>
+        </Border>
 
-        <!-- Просмотрщик Markdown -->
-        <ScrollViewer>
-            <markdig:MarkdownViewer x:Name="MarkdownViewer" Margin="15"/>
+        <!-- Основное содержимое -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20">
+                <!-- Карточка с формой входа -->
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <TextBlock Text="Демонстрация переключения тем" 
+                                   FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
+
+                        <TextBlock Text="Имя пользователя:"/>
+                        <TextBox Text="Введите ваше имя"/>
+
+                        <TextBlock Text="Пароль:" Margin="0,16,0,0"/>
+                        <TextBox Text="********"/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                            <Button Content="Войти"/>
+                            <Button Content="Отмена"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Карточка с элементами управления -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Элементы управления" 
+                                   FontSize="16" FontWeight="Bold" Margin="0,0,0,16"/>
+
+                        <Button Content="Обычная кнопка"/>
+                        <Button Content="Кнопка с иконкой"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="8">
+                            <RadioButton Content="Опция 1"/>
+                            <RadioButton Content="Опция 2"/>
+                        </StackPanel>
+
+                        <CheckBox Content="Согласен с условиями"/>
+                        <CheckBox Content="Получать уведомления" IsChecked="True"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Карточка с информацией -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Информация о теме" 
+                                   FontSize="16" FontWeight="Bold" Margin="0,0,0,16"/>
+
+                        <TextBlock Text="Текущая тема:" FontWeight="Bold"/>
+                        <TextBlock x:Name="ThemeInfoText" Text="Тёмная тема" Margin="0,0,0,16"/>
+
+                        <TextBlock Text="Используйте переключатель в верхнем правом углу для смены темы." 
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
         </ScrollViewer>
-    </DockPanel>
+    </Grid>
 </Window>

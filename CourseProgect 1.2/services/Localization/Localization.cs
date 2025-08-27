@@ -69,10 +69,8 @@ namespace CourseProgect_1._2.services.Localization
                 Translations.Add(new LocalizationScanner().ScanAndIntegrate(directory.FullName));
             }
 
-            // Устанавливаем язык по умолчанию
             if (!LanguageFileExists("LanguageCustomization.config"))
             {
-                // Устанавливаем язык по умолчанию
                 if (language.Count > 0)
                 {
                     WriteToIsolatedStorage("LanguageCustomization.config", language[0]);
@@ -159,7 +157,7 @@ namespace CourseProgect_1._2.services.Localization
 
         public void OverwriteFile(string fileName, string newContent)
         {
-            WriteToIsolatedStorage(fileName, newContent); // Просто используем тот же метод
+            WriteToIsolatedStorage(fileName, newContent); 
         }
     }
 }
