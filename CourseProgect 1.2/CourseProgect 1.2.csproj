@@ -42,4 +42,20 @@
 
 		<Message Text="Скопировано файлов: @(AllLanguageFiles-&gt;Count())" Importance="high" />
 	</Target>
+	<Target Name="CopyThemeFiles" AfterTargets="Build">
+		<Message Text="Копирование файлов тем..." Importance="high" />
+
+		<!-- Создаем папку Themes если ее нет -->
+		<MakeDir Directories="$(OutputPath)Themes" Condition="!Exists('$(OutputPath)Themes')" />
+
+		<ItemGroup>
+			<ThemeFiles Include="Themes\*.xaml" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(ThemeFiles)"
+			  DestinationFolder="$(OutputPath)Themes"
+			  SkipUnchangedFiles="true" />
+
+		<Message Text="Скопировано файлов тем: @(ThemeFiles->Count())" Importance="high" />
+	</Target>
 </Project>

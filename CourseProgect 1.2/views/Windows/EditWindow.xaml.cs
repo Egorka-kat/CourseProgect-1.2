@@ -1,4 +1,5 @@
 ﻿using CourseProgect_1._2.models;
+using CourseProgect_1._2.Services;
 using CourseProgect_1._2.ViewModels;
 using ICSharpCode.AvalonEdit;
 using Microsoft.Web.WebView2.Core;
@@ -20,9 +21,13 @@ namespace CourseProgect_1._2.Views.Windows
 
         public EditWindow(string path)
         {
+            ThemeService.ApplyTheme(ThemeService.CurrentTheme, true);
+
             _PathParameter = path;
             DataContext = new EW_ViewModel();
-            InitializeComponent();
+
+                InitializeComponent();
+
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

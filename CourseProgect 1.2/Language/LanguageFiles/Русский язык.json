@@ -2,7 +2,7 @@
   "Русский язык": {
     "Are you sure you want to delete": "Вы уверены, что хотите удалить",
     "A file or folder with that name already exists": "Файл или папка с таким именем уже существуют",
-	"The file or folder does not exist": "Файл или папка не существует",
+    "The file or folder does not exist": "Файл или папка не существует",
     "Another...": "Другой...",
     "Calcer": "Отмена",
     "Confirmation of deletion": "Подтверждение удаления",
@@ -19,7 +19,7 @@
     "Expansion": "Расширение",
     "Export a project": "Экспортировать проект",
     "File": "Файл",
-	"file" : "файл",
+    "file": "файл",
     "File Name": "Имя файла",
     "File Type": "Тип файла",
     "File creation error": "Ошибка создания файла",
@@ -39,15 +39,18 @@
     "Success": "Успех",
     "The data is incorrect": "Данные некорректные данные",
     "This project has already been uploaded": "Данный проект уже загружен",
-	"The file is being used by another program" : "Файл используется другой программой",
+    "The file is being used by another program": "Файл используется другой программой",
     "To create": "Создать",
     "Delete": "Удалить",
     "renamed to": "переименован в",
     "successfully deleted": "успешно удален",
     "the folder": "папку",
-	"Language": "Язык",
-	"Open" : "Открыть",
-	"Folder Name" : "Имя папки:",
-	"Open in File Explorer" : "Открыть в проводнике"
+    "Language": "Язык",
+    "Open": "Открыть",
+    "Folder Name": "Имя папки:",
+    "Open in File Explorer": "Открыть в проводнике",
+    "Theme": "Тема",
+    "Light theme": "Светлая тема",
+    "Dark theme": "Тёмная тема"
   }
 }

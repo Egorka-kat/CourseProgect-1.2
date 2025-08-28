@@ -1,5 +1,6 @@
 ﻿using CourseProgect_1._2.models;
 using CourseProgect_1._2.Models;
+using CourseProgect_1._2.Services;
 using CourseProgect_1._2.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +17,9 @@ namespace CourseProgect_1._2
         internal MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
         public MainWindow()
         {
+            ThemeService.ApplyTheme(ThemeService.CurrentTheme);
 
+            InitializeComponent();
             DataContext = new MainWindowViewModel();
             InitializeComponent();
         }

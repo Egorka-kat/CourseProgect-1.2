@@ -1,6 +1,7 @@
 ﻿using CourseProgect_1._2.Infrastructure.Commands;
 using CourseProgect_1._2.models;
 using CourseProgect_1._2.services.Localization;
+using CourseProgect_1._2.Services;
 using CourseProgect_1._2.ViewModels.Base;
 using CourseProgect_1._2.views.Windows;
 using CourseProgect_1._2.Views.Windows;
@@ -18,6 +19,36 @@ namespace CourseProgect_1._2.ViewModels
 {
     class EW_ViewModel : ViewModel
     {
+        private Theme _currentTheme = ThemeService.CurrentTheme;
+
+        public bool IsLightTheme => _currentTheme == Theme.Light;
+        public bool IsDarkTheme => _currentTheme == Theme.Dark;
+
+        public string StringTheme => localization["Theme"];
+        public string StringLightTheme => localization["Light theme"];
+        public string StringDarkTheme => localization["Dark theme"];
+        private void UpdateThemeProperties()
+        {
+            OnPropertyChanged(nameof(IsLightTheme));
+            OnPropertyChanged(nameof(IsDarkTheme));
+        }
+        private void OnThemeChanged()
+        {
+            // Обновляем свойства при изменении темы
+            UpdateThemeProperties();
+        }
+
+        public ICommand ChangeThemeCommand { get; set; }
+        private bool CanChangeThemeCommandExecuted(object par) => true;
+        public void OnChangeThemeCommandExecuted(object par)
+        {
+            if (par is string themeName)
+            {
+                var theme = themeName == "Dark" ? Theme.Dark : Theme.Light;
+                ThemeService.ApplyTheme(theme);
+            }
+        }
+
         #region Переменные для TreeView
         public ObservableCollection<FileSystemItem> FileSystemItems { get; set; } = new ObservableCollection<FileSystemItem>();
         private FileSystemItem DragFileItem;
@@ -50,11 +81,16 @@ namespace CourseProgect_1._2.ViewModels
         public string StringDelete => localization["Delete"];
         private void OnLanguageChanged()
         {
+
             #region Перевод верхнего меню
             OnPropertyChanged(nameof(StringFile));
             OnPropertyChanged(nameof(StringOpenAProject));
             OnPropertyChanged(nameof(StringSaveEverything));
             OnPropertyChanged(nameof(StringSave));
+
+            OnPropertyChanged(nameof(StringDarkTheme));
+            OnPropertyChanged(nameof(StringLightTheme));
+            OnPropertyChanged(nameof(StringTheme));
 
             OnPropertyChanged(nameof(StringLanguage));
             #endregion
@@ -66,6 +102,7 @@ namespace CourseProgect_1._2.ViewModels
             OnPropertyChanged(nameof(StringRename));
             OnPropertyChanged(nameof(StringDelete));
             #endregion
+            UpdateThemeProperties();
         }
         #endregion
 
@@ -983,13 +1020,20 @@ namespace CourseProgect_1._2.ViewModels
                 MessageBox.Show(localization["The file or folder does not exist"]);
             }
         }
+        ~EW_ViewModel()
+        {
+            ThemeService.ThemeChanged -= OnThemeChanged;
+            localization.LanguageChanged -= OnLanguageChanged;
+        }
         public EW_ViewModel()
         {
+            ThemeService.ThemeChanged += OnThemeChanged;
             localization.LanguageChanged += OnLanguageChanged;
             ClosingTreeView = new LambdaCommand(OnClosingTreeViewExecuted, CanClosingTreeViewExecuted);
             DeleteCommand = new LambdaCommand(OnDeleteCommandExecuted, CanDeleteCommandExecuted);
             RenameCommand = new LambdaCommand(OnRenameCommandExecuted, CanRenameCommandExecuted);
 
+            ChangeThemeCommand = new LambdaCommand(OnChangeThemeCommandExecuted, CanChangeThemeCommandExecuted);
             OpenExplorer = new LambdaCommand(OnOpenExplorerExecuted, CanOpenExplorerExecuted);
             OpenCommand = new LambdaCommand(OnOpenCommandExecuted, CanOpenCommandExecuted);
             CloseTabCommand = new LambdaCommand(OnCloseTabCommandExecuted, CanCloseTabCommandExecuted);

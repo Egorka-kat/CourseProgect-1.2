@@ -12,16 +12,58 @@
         xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
         Loaded="Window_Loaded"
         mc:Ignorable="d"
-        Title="EditWindow" Height="450" Width="800" Closing="Window_Closing">
-    
+        Title="EditWindow" Height="450" Width="800" Closing="Window_Closing"
+        Background="{DynamicResource BackgroundBrush}">
+    <Window.Resources>
+        <!-- ContextMenu для файлов -->
+        <ContextMenu x:Key="FileContextMenu" x:Shared="False"
+             Background="{DynamicResource BackgroundBrush}"
+             Foreground="{DynamicResource ForegroundBrush}">
+            <MenuItem Header="{Binding DataContext.StringOpen, RelativeSource={RelativeSource AncestorType=Window}}"
+              Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <Separator/>
+            <MenuItem Header="{Binding DataContext.StringOpenInFileExplorer, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.OpenExplorer, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringRename, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringDelete, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+        </ContextMenu>
+
+        <!-- ContextMenu для папок -->
+        <ContextMenu x:Key="FolderContextMenu" x:Shared="False"
+             Background="{DynamicResource BackgroundBrush}"
+             Foreground="{DynamicResource ForegroundBrush}">
+            <MenuItem Header="{Binding DataContext.StringCreateAFile, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.ToСreateFileCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringCreateAFolder, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.ToСreateDirectoryCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <Separator/>
+            <MenuItem Header="{Binding DataContext.StringOpenInFileExplorer, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.OpenExplorer, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringRename, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringDelete, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+        </ContextMenu>
+    </Window.Resources>
     <DockPanel>
         <!--#region Верхнее поле меню-->
-        <Grid DockPanel.Dock="Top">
+        <Grid DockPanel.Dock="Top" Background="{DynamicResource MenuBackgroundBrush}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20*"></ColumnDefinition>
                 <ColumnDefinition Width="1*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Menu HorizontalAlignment="Left" Grid.Column="0" Background="White">
+            <Menu HorizontalAlignment="Left" Grid.Column="0" Background="{DynamicResource BackgroundBrush}">
                 <MenuItem Margin="2,0,2,0"
             Command="{Binding ClosingTreeView}" 
                   CommandParameter="{Binding ElementName=Col1}">
@@ -48,7 +90,16 @@
                         </DataTemplate>
                     </MenuItem.ItemTemplate>
                 </MenuItem>
+                <MenuItem Header="{Binding StringTheme}">
+                    <MenuItem Header="{Binding StringLightTheme}"
+             Command="{Binding ChangeThemeCommand}"
+             CommandParameter="Light"/>
+                    <MenuItem Header="{Binding StringDarkTheme}"
+             Command="{Binding ChangeThemeCommand}"
+             CommandParameter="Dark"/>
+                </MenuItem>
             </Menu>
+            
             <Menu Grid.Column="1" HorizontalAlignment="Right" Background="White">
                 <MenuItem Margin="2,0,2,0" 
                 Command="{Binding ClosingWebView}" 
@@ -73,63 +124,26 @@
                     <ColumnDefinition x:Name="Col3" Width="35*" />
                 </Grid.ColumnDefinitions>
                 <!--#region TreeView-->
-                <TreeView Margin="6,6,10,6" ItemsSource="{Binding FileSystemItems}">
+                <TreeView Margin="6,6,10,6" ItemsSource="{Binding FileSystemItems}"
+                           Background="{DynamicResource TreeViewBackgroundBrush}"
+                     Foreground="{DynamicResource ForegroundBrush}">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="Foreground" Value="{DynamicResource TreeViewItemForegroundBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDirectory}" Value="False">
+                                    <Setter Property="ContextMenu" Value="{StaticResource FileContextMenu}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                                    <Setter Property="ContextMenu" Value="{StaticResource FolderContextMenu}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
                     <TreeView.Resources>
-                        <ContextMenu x:Key="ItemContextMenu">
-                            <MenuItem Header="{Binding DataContext.StringOpen, RelativeSource={RelativeSource AncestorType=Window}}"
-                      Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                      CommandParameter="{Binding}">
-                                
-                                <MenuItem.Style>
-                                    <Style TargetType="MenuItem">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsDirectory}" Value="True">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                            </MenuItem>
-                            <MenuItem Header="{Binding DataContext.StringCreateAFile, RelativeSource={RelativeSource AncestorType=Window}}" 
-Command="{Binding DataContext.ToСreateFileCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-CommandParameter="{Binding}">
-                                <MenuItem.Style>
-                                    <Style TargetType="MenuItem">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsDirectory}" Value="false">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                            </MenuItem>
-                            <MenuItem Header="{Binding DataContext.StringCreateAFolder, RelativeSource={RelativeSource AncestorType=Window}}" 
-Command="{Binding DataContext.ToСreateDirectoryCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-CommandParameter="{Binding}">
-                                <MenuItem.Style>
-                                    <Style TargetType="MenuItem">
-                                        <Setter Property="Visibility" Value="Visible"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsDirectory}" Value="false">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                            </MenuItem>
-                            <MenuItem Header="{Binding DataContext.StringOpenInFileExplorer, RelativeSource={RelativeSource AncestorType=Window}}" 
-Command="{Binding DataContext.OpenExplorer, RelativeSource={RelativeSource AncestorType=TreeView}}"
-CommandParameter="{Binding}"/>
-                            <MenuItem Header="{Binding DataContext.StringRename, RelativeSource={RelativeSource AncestorType=Window}}" 
-Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-CommandParameter="{Binding}"/>
-                            <MenuItem Header="{Binding DataContext.StringDelete, RelativeSource={RelativeSource AncestorType=Window}}" 
-                      Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
-                      CommandParameter="{Binding}"/>
-                        </ContextMenu>
+                       
                         <Style TargetType="TreeViewItem">
+                            
                             <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
                         </Style>
                         <HierarchicalDataTemplate DataType="{x:Type mod:FileSystemItem}" 
@@ -187,6 +201,8 @@ CommandParameter="{Binding}"/>
                 <TabControl ItemsSource="{Binding TabItems}"
                             SelectedIndex="{Binding SelectedTabIndex}"
                             SelectedItem="{Binding ActiveaTabSystemItem, Mode=Default}"
+                            Background="{DynamicResource BackgroundBrush}"
+                       Foreground="{DynamicResource ForegroundBrush}"
                             Grid.Column="1" 
                             Margin="5,3,5,5">
                     <TabControl.Resources>
@@ -250,7 +266,7 @@ CommandParameter="{Binding}"/>
                 </TabControl>
                 <!--#endregion-->
                 <!--#region  WebView-->
-                <Grid Grid.Column="2" DataContext="{Binding ActiveaTabSystemItem}">
+                <Grid Grid.Column="2" DataContext="{Binding ActiveaTabSystemItem}"  >
 
                     <!-- WebView2 - скрыт когда IsMd = true -->
                     <wv2:WebView2 x:Name="webView" 
@@ -259,8 +275,9 @@ CommandParameter="{Binding}"/>
                   Visibility="{Binding IsMd, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=inverse}"/>
 
                     <!-- MarkdownViewer - виден когда IsMd = true -->
-                    <ScrollViewer Margin="5">
+                    <ScrollViewer Margin="5" Background="White">
                         <markdig:MarkdownViewer x:Name="MarkdownViewer" 
+                                               
                                Markdown="{Binding Text}"
                                Visibility="{Binding IsMd, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </ScrollViewer>

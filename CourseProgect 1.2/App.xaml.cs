@@ -1,4 +1,5 @@
 ﻿using CourseProgect_1._2.services.Localization;
+using CourseProgect_1._2.Services;
 using ICSharpCode.AvalonEdit.Search;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,7 +16,11 @@ namespace CourseProgect_1._2
    
     public partial class App : Application
     {
-
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            // Инициализируем тему при запуске приложения
+            ThemeService.Initialize();
+        }
     }
     
 }
