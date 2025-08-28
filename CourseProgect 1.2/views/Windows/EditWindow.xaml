@@ -5,20 +5,183 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourseProgect_1._2.Views.Windows"
         xmlns:vm="clr-namespace:CourseProgect_1._2.ViewModels"
+        xmlns:mod="clr-namespace:CourseProgect_1._2.models"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+        Loaded="Window_Loaded"
         mc:Ignorable="d"
-        Title="EditWindow" Height="450" Width="800">
+        Title="EditWindow" Height="450" Width="800" Closing="Window_Closing"
+        Background="{DynamicResource BackgroundBrush}">
+    <Window.Resources>
+        <!-- ContextMenu для файлов -->
+        <ContextMenu x:Key="FileContextMenu" x:Shared="False"
+             Background="{DynamicResource BackgroundBrush}"
+             Foreground="{DynamicResource ForegroundBrush}">
+            <MenuItem Header="{Binding DataContext.StringOpen, RelativeSource={RelativeSource AncestorType=Window}}"
+              Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <Separator/>
+            <MenuItem Header="{Binding DataContext.StringOpenInFileExplorer, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.OpenExplorer, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringRename, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringDelete, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+        </ContextMenu>
+
+        <!-- ContextMenu для папок -->
+        <ContextMenu x:Key="FolderContextMenu" x:Shared="False"
+             Background="{DynamicResource BackgroundBrush}"
+             Foreground="{DynamicResource ForegroundBrush}">
+            <MenuItem Header="{Binding DataContext.StringCreateAFile, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.ToСreateFileCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringCreateAFolder, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.ToСreateDirectoryCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <Separator/>
+            <MenuItem Header="{Binding DataContext.StringOpenInFileExplorer, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.OpenExplorer, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringRename, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.RenameCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+            <MenuItem Header="{Binding DataContext.StringDelete, RelativeSource={RelativeSource AncestorType=Window}}" 
+              Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+              CommandParameter="{Binding}"/>
+        </ContextMenu>
+    </Window.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Файл"/>
-        </Menu>
+        <!--#region Верхнее поле меню-->
+        <Grid DockPanel.Dock="Top" Background="{DynamicResource MenuBackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*"></ColumnDefinition>
+                <ColumnDefinition Width="1*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Menu HorizontalAlignment="Left" Grid.Column="0" Background="{DynamicResource BackgroundBrush}">
+                <MenuItem Margin="2,0,2,0"
+            Command="{Binding ClosingTreeView}" 
+                  CommandParameter="{Binding ElementName=Col1}">
+                    <MenuItem.Icon>
+                        <fa:FontAwesome 
+                    Icon="{Binding PanelIcon}"
+                        Height="14"
+                        />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{Binding StringFile}" Grid.Column="0">
+                    <MenuItem Header="{Binding StringOpenAProject}"
+                         Command="{Binding OpenMainWindowCommand}"
+                             CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+                    <MenuItem Header="{Binding StringSaveEverything}"
+                              Command="{Binding SaveAllCommand}"/>
+                    <MenuItem Header="{Binding StringSave}"
+                              Command="{Binding SaveActiveaTabItemCommand}"/>
+                </MenuItem>
+                <MenuItem Header="{Binding StringLanguage}" ItemsSource="{Binding loc}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <MenuItem Header="{Binding}" Click="MenuItem_Click"/>
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
+                <MenuItem Header="{Binding StringTheme}">
+                    <MenuItem Header="{Binding StringLightTheme}"
+             Command="{Binding ChangeThemeCommand}"
+             CommandParameter="Light"/>
+                    <MenuItem Header="{Binding StringDarkTheme}"
+             Command="{Binding ChangeThemeCommand}"
+             CommandParameter="Dark"/>
+                </MenuItem>
+            </Menu>
+            
+            <Menu Grid.Column="1" HorizontalAlignment="Right" Background="White">
+                <MenuItem Margin="2,0,2,0" 
+                Command="{Binding ClosingWebView}" 
+                CommandParameter="{Binding ElementName=Col3}"
+                          HorizontalAlignment="Right">
+                    <MenuItem.Icon>
+                        <fa:FontAwesome 
+                        Icon="{Binding PanelIconWebView}"
+                        Height="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </Menu>
+        </Grid>
+        <!--#endregion-->
+        
+        <!--#region Нижнее поле-->
         <DockPanel DockPanel.Dock="Bottom">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40*" MaxWidth="350"/>
-                    <ColumnDefinition Width="127*"/>
-                    <ColumnDefinition Width="35*" MaxWidth="350"/>
+                    <ColumnDefinition x:Name="Col1" Width="38*" MaxWidth="350"/>
+                    <ColumnDefinition Width="127*" MinWidth="40"/>
+                    <ColumnDefinition x:Name="Col3" Width="35*" />
                 </Grid.ColumnDefinitions>
-                <TreeView Grid.Column="0" Height="auto" Width="auto" VerticalAlignment="Top" Margin="8" />
+                <!--#region TreeView-->
+                <TreeView Margin="6,6,10,6" ItemsSource="{Binding FileSystemItems}"
+                           Background="{DynamicResource TreeViewBackgroundBrush}"
+                     Foreground="{DynamicResource ForegroundBrush}">
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="Foreground" Value="{DynamicResource TreeViewItemForegroundBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDirectory}" Value="False">
+                                    <Setter Property="ContextMenu" Value="{StaticResource FileContextMenu}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                                    <Setter Property="ContextMenu" Value="{StaticResource FolderContextMenu}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.Resources>
+                       
+                        <Style TargetType="TreeViewItem">
+                            
+                            <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
+                        </Style>
+                        <HierarchicalDataTemplate DataType="{x:Type mod:FileSystemItem}" 
+                     ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal" 
+                                        Drop="TreeViewStackPanel_Drop"
+                                        MouseLeftButtonDown="TreeViewStackPanel_MouseDown">
+
+                                <StackPanel.InputBindings>
+                                    <MouseBinding MouseAction="LeftDoubleClick"
+                          Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=TreeView}}"
+                          CommandParameter="{Binding}"/>
+                                </StackPanel.InputBindings>
+
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDirectory}" Value="True">
+                                                <Setter Property="AllowDrop" Value="True"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsDirectory}" Value="False">
+                                                <Setter Property="AllowDrop" Value="False"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <fa:ImageAwesome Margin="0,0,5,0" Width="10" 
+                                 Icon="{Binding IsDirectory, Converter={StaticResource IconConverter}}" 
+                                 VerticalAlignment="Center" 
+                                 HorizontalAlignment="Center" />
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+                <!--#endregion-->
+                <!--#region GridSplitters-->
                 <GridSplitter
                     Margin="0,5,0,5"
                     Grid.Column="0" 
@@ -33,8 +196,96 @@
                     Width="4"
                     Background="LightGray"
                     />
-                <TabControl Grid.Column="1" VerticalAlignment="Top" Margin="5"/>
+                <!--#endregion-->      
+                <!--#region TabControl-->
+                <TabControl ItemsSource="{Binding TabItems}"
+                            SelectedIndex="{Binding SelectedTabIndex}"
+                            SelectedItem="{Binding ActiveaTabSystemItem, Mode=Default}"
+                            Background="{DynamicResource BackgroundBrush}"
+                       Foreground="{DynamicResource ForegroundBrush}"
+                            Grid.Column="1" 
+                            Margin="5,3,5,5">
+                    <TabControl.Resources>
+                        <Style x:Key="CloseButtonStyle" TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Grid>
+                                            <Ellipse Name="BG"/>
+                                            <Path Name="PATH" Stroke="Gray" StrokeThickness="2" Stretch="Fill"
+         Data="M 0 0 M 0.3 0.3 L 0.7 0.7 M 0.3 0.7 L 0.7 0.3 M 1 1"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="BG" Property="Fill" Value="#DB4437"/>
+                                                <Setter TargetName="PATH" Property="Stroke" Value="White"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="BG" Property="Fill" Value="#A8352A"/>
+                                                <Setter TargetName="PATH" Property="Stroke" Value="White"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel HorizontalAlignment="Stretch"
+                                       MouseDown="DockPanel_MouseDown" 
+                                       AllowDrop="True"
+                                       Drop="DockPanel_Drop">
+                                <TextBlock Text="{Binding TitleName}" 
+                           VerticalAlignment="Center"
+                           Margin="0,0,5,0"/>
+                                <Button Height="15" Width="15" HorizontalAlignment="Center" Style="{StaticResource CloseButtonStyle}"
+                        Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                        CommandParameter="{Binding}">
+                                </Button>
+                            </DockPanel>
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <avalonEdit:TextEditor 
+                                Document="{Binding Document}"
+                                Grid.Row="0"
+                                SyntaxHighlighting="{Binding SyntaxHighlighting}"
+                                TextChanged="TextEditor_TextChanged"
+                                Tag="{Binding}"
+                                FontFamily="Consolas"
+                                FontSize="12pt"
+                                ShowLineNumbers="True"
+                                WordWrap="False">
+                                
+                            </avalonEdit:TextEditor>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+                <!--#endregion-->
+                <!--#region  WebView-->
+                <Grid Grid.Column="2" DataContext="{Binding ActiveaTabSystemItem}"  >
+
+                    <!-- WebView2 - скрыт когда IsMd = true -->
+                    <wv2:WebView2 x:Name="webView" 
+                                  Margin="5"
+                  Source="{Binding UriPath}"
+                  Visibility="{Binding IsMd, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=inverse}"/>
+
+                    <!-- MarkdownViewer - виден когда IsMd = true -->
+                    <ScrollViewer Margin="5" Background="White">
+                        <markdig:MarkdownViewer x:Name="MarkdownViewer" 
+                                               
+                               Markdown="{Binding Text}"
+                               Visibility="{Binding IsMd, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </ScrollViewer>
+
+                </Grid>
+                <!--#endregion-->
             </Grid>
         </DockPanel>
+        <!--#endregion-->
     </DockPanel>
 </Window>

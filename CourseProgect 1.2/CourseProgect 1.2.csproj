@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+	  <TargetFramework>net8.0-windows</TargetFramework>
     <RootNamespace>CourseProgect_1._2</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,12 +10,52 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="services\" />
+    <COMReference Include="{215d64d2-031c-33c7-96e3-61794cd1ee61}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>2</VersionMajor>
+      <Guid>215d64d2-031c-33c7-96e3-61794cd1ee61</Guid>
+    </COMReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Markdown" Version="2.2.1" />
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
+    <PackageReference Include="Markdig.Wpf" Version="0.5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3405.78" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.8" />
+    <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.24.0" />
   </ItemGroup>
+	<Target Name="CopyLanguageFolder" AfterTargets="Build">
+		<Message Text="Копирование папки Language со всеми подпапками..." Importance="high" />
 
+		<!-- Создаем целевую папку -->
+		<MakeDir Directories="$(OutputPath)Language" Condition="!Exists('$(OutputPath)Language')" />
+
+		<!-- Копируем ВСЕ содержимое папки Language -->
+		<ItemGroup>
+			<AllLanguageFiles Include="$(ProjectDir)Language\**\*.*" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(AllLanguageFiles)" DestinationFiles="@(AllLanguageFiles->'$(OutputPath)Language\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+		<Message Text="Скопировано файлов: @(AllLanguageFiles-&gt;Count())" Importance="high" />
+	</Target>
+	<Target Name="CopyThemeFiles" AfterTargets="Build">
+		<Message Text="Копирование файлов тем..." Importance="high" />
+
+		<!-- Создаем папку Themes если ее нет -->
+		<MakeDir Directories="$(OutputPath)Themes" Condition="!Exists('$(OutputPath)Themes')" />
+
+		<ItemGroup>
+			<ThemeFiles Include="Themes\*.xaml" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(ThemeFiles)"
+			  DestinationFolder="$(OutputPath)Themes"
+			  SkipUnchangedFiles="true" />
+
+		<Message Text="Скопировано файлов тем: @(ThemeFiles->Count())" Importance="high" />
+	</Target>
 </Project>

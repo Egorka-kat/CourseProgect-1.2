@@ -5,11 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourseProgect_1._2"
         xmlns:vm ="clr-namespace:CourseProgect_1._2.ViewModels"
-        Title="{Binding Title}" Height="450" Width="800">
-    <Window.DataContext>
-        <vm:MainWindowViewModel/>
-    </Window.DataContext>
-    <Grid>
-        
-    </Grid>
+        Title="{Binding Title}" MinHeight="400" Height="450" Width="750" MinWidth="680">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Right" >
+            <Button Command="{Binding CommandExportNewProgect}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Content="{Binding StringExportAProject}" Margin="10"  MinHeight="60" VerticalAlignment="Bottom" HorizontalAlignment="Right" MinWidth="190"/>
+            <Button Command="{Binding CommandCreateNewProgect}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Content="{Binding StringCreateANewProject}" Margin="10,0,10,10" MinHeight="60" VerticalAlignment="Bottom" HorizontalAlignment="Right" MinWidth="190" />
+        </StackPanel>
+        <ScrollViewer DockPanel.Dock="Left" Margin="10,10,0,10" MinHeight="300" MinWidth="400" HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+            <ListBox ItemsSource="{Binding Progects}"
+                     SelectedItem="{Binding Progect}" MouseLeftButtonUp="ListBox_MouseLeftButtonUp">
+                <ListBox.ItemTemplate > 
+                    <DataTemplate>
+                        <StackPanel Margin="10">
+                            <TextBlock FontSize="12" Text="{Binding Path=Name}" />
+                            <TextBlock FontSize="8" Text="{Binding Path=Path}" />
+                            <TextBlock FontSize="10" Text="{Binding Path=Last_call_date}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+    </DockPanel>
 </Window>

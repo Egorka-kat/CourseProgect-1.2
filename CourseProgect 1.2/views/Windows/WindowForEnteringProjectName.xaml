@@ -1,0 +1,38 @@
+﻿<Window x:Class="CourseProgect_1._2.views.Windows.WindowForEnteringProjectName"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CourseProgect_1._2.views.Windows"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:vm ="clr-namespace:CourseProgect_1._2.viewmodels"
+        mc:Ignorable="d"
+        Height="160" Width="400"  ResizeMode="NoResize">
+    <Window.DataContext>
+        <vm:WFEPN_ViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3.5*"/>
+            <RowDefinition Height="3.5*"/>
+            <RowDefinition Height="3*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="6*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.Column="0" Grid.Row="0">
+            <TextBlock DockPanel.Dock="Left" Text="{Binding StringProjectName}"  Margin="5,10,5,10"/>
+            <TextBox  x:Name="TextBoxNameProgect" DockPanel.Dock="Right" Text="{Binding TextBox_NameProgect, UpdateSourceTrigger=PropertyChanged}"  Margin="0,10,10,10" />
+        </DockPanel>
+        <DockPanel Grid.Column="0" Grid.Row="1">
+            <TextBlock DockPanel.Dock="Left" Text="{Binding StringProjectPath}" Margin="5,10,5,10" />
+            <TextBox IsEnabled="False" x:Name="TextBoxPathProgect" DockPanel.Dock="Right" Text="{Binding TextBox_PathProgect}" Margin="0,10,10,10" IsReadOnly="True"/>
+        </DockPanel>
+        <Button Command="{Binding OpenExplorer}"  Grid.Column="1" Grid.Row="1" Margin="10,8,10,8" Style="{StaticResource BTND}">
+            <fa:ImageAwesome Icon="FolderOutlinepenOutline" Margin="1.5"  VerticalAlignment="Center" HorizontalAlignment="Center" />
+        </Button>
+        <Button Command="{Binding CloseWindowCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="2" Content="{Binding StringCalcer}" Grid.Column="0" Margin="250,4,10,4"  Style="{StaticResource BTND}"/>
+        <Button Command="{Binding ClickOk}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Grid.Row="2" Content="{Binding StringOk}" Grid.Column="1" Margin="10,4,10,4"  Style="{StaticResource BTND}"/>
+    </Grid>
+</Window>

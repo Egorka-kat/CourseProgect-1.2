@@ -1,0 +1,105 @@
+﻿<Window x:Class="CourseProgect_1._2.views.Windows.ToCreateFileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CourseProgect_1._2.views.Windows"
+        xmlns:vm="clr-namespace:CourseProgect_1._2.ViewModels"
+        xmlns:md="clr-namespace:CourseProgect_1._2.models"
+        mc:Ignorable="d"
+        Title="ToCreateFileWindow" Height="275" Width="400">
+    <Window.Resources>
+    </Window.Resources>
+    <Grid>
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" Height="172">
+                <GroupBox Header="{Binding StringFileType}" DockPanel.Dock="Left" Margin="0,0,0,10">
+                    <StackPanel>
+                        <RadioButton Content="{Binding StringplainText}" 
+                     GroupName="FileType" 
+                     IsChecked="{Binding SelectedFileType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static md:FileType.Text}}"
+                     Margin="2"/>
+
+                        <RadioButton Content="Markdown (.md)" 
+                     GroupName="FileType"
+                     IsChecked="{Binding SelectedFileType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static md:FileType.Markdown}}"
+                     Margin="2"/>
+
+                        <RadioButton Content="HTML (.html)" 
+                     GroupName="FileType"
+                     IsChecked="{Binding SelectedFileType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static md:FileType.Html}}"
+                     Margin="2"/>
+
+                        <RadioButton Content="JSON (.json)" 
+                     GroupName="FileType"
+                     IsChecked="{Binding SelectedFileType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static md:FileType.Json}}"
+                     Margin="2"/>
+
+                        <RadioButton Content="XML (.xml)" 
+                     GroupName="FileType"
+                     IsChecked="{Binding SelectedFileType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static md:FileType.Xml}}"
+                     Margin="2"/>
+
+                        <RadioButton Content="C# (.cs)" 
+                     GroupName="FileType"
+                     IsChecked="{Binding SelectedFileType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static md:FileType.CSharp}}"
+                     Margin="2"/>
+
+                        <RadioButton Content="{Binding StringAnother}" 
+                     GroupName="FileType"
+                     IsChecked="{Binding SelectedFileType, Converter={StaticResource EnumToBoolConverter}, ConverterParameter={x:Static md:FileType.Custom}}"
+                     Margin="2"/>
+                    </StackPanel>
+                </GroupBox>
+                <Grid DockPanel.Dock="Right">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,10,0,0">
+                        <TextBlock Text="{Binding StringFileName}" 
+                           DockPanel.Dock="Left" 
+                           VerticalAlignment="Center"
+                           Margin="5,0,5,0"/>
+
+                        <TextBox Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}"
+           Margin="0,10,15,10"/>
+                    </DockPanel>
+                    <DockPanel Grid.Row="1" Margin="0,5,0,5">
+                        <TextBlock Text="{Binding StringExpansion}" 
+                       DockPanel.Dock="Left" 
+                       VerticalAlignment="Center"
+                       Margin="5,0,10,0"/>
+
+                        <TextBox Text="{Binding CustomExtension, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding IsCustomExtensionEnabled}"
+                               Margin="0,10,15,10">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="IsReadOnly" Value="True"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCustomExtensionEnabled}" Value="True">
+                                            <Setter Property="IsReadOnly" Value="False"/>
+                                            <Setter Property="Background" Value="White"/>
+                                            <Setter Property="ToolTip" Value="Введите собственное расширение (например: .py, .js, .php)"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </DockPanel>
+                </Grid>
+            </DockPanel>
+            <Grid DockPanel.Dock="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" Content="{Binding StringCalcer}" Click="Calcer_Button" Margin="20,20,10,20"/>
+                <Button Grid.Column="2" Content="{Binding StringToCreate}" Click="Save_Button" Margin="10,20,20,20"/>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</Window>

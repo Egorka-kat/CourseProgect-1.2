@@ -1,0 +1,296 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+                     xmlns:fa="http://schemas.fontawesome.io/icons/">
+
+    <!-- Основные цвета -->
+    <Color x:Key="BackgroundColor">#FFFFFFFF</Color>
+    <Color x:Key="ForegroundColor">#FF000000</Color>
+    <Color x:Key="BorderColor">#FFCCCCCC</Color>
+    <Color x:Key="AccentColor">#FF007ACC</Color>
+    <Color x:Key="MenuBackgroundColor">#FFF0F0F0</Color>
+    <Color x:Key="HighlightColor">#FFE3F2FD</Color>
+    <Color x:Key="SuccessColor">#FF4CAF50</Color>
+    <Color x:Key="WarningColor">#FFFFC107</Color>
+    <Color x:Key="ErrorColor">#FFF44336</Color>
+    <Color x:Key="TabItemBackground">#FFFFFFFF</Color>
+    <Color x:Key="TabItemForeground">#FF000000</Color>
+    <Color x:Key="TabItemBorder">#FFCCCCCC</Color>
+    <Color x:Key="TabItemSelectedBackground">#FFE6E6E6</Color>
+    <Color x:Key="TabItemSelectedForeground">#FF000000</Color>
+    <Color x:Key="TabItemSelectedBorder">#FF007ACC</Color>
+    <Color x:Key="TabItemHoverBackground">#FFF0F0F0</Color>
+
+    <!-- Цвета текста -->
+    <Color x:Key="TextEditorBackground">#FFFFFFFF</Color>
+    <Color x:Key="TextEditorForeground">#FF000000</Color>
+    <Color x:Key="TreeViewBackground">#FFF5F5F5</Color>
+    <Color x:Key="TreeViewForeground">#FF000000</Color>
+    <Color x:Key="TreeViewItemForeground">#FF000000</Color>
+    <Color x:Key="TabControlBackground">#FFFFFFFF</Color>
+    <Color x:Key="TabControlForeground">#FF000000</Color>
+    <Color x:Key="ListBorderColor">#FFCCCCCC</Color>
+    <Color x:Key="ButtonBackground">#FFF5F5F5</Color>
+    <Color x:Key="ButtonForeground">#FF000000</Color>
+    <Color x:Key="ButtonHoverBackground">#FFE0E0E0</Color>
+
+    <Color x:Key="ListBoxBackground">#FFFFFFFF</Color>
+    <Color x:Key="ListBoxForeground">#FF000000</Color>
+    <!-- Кисти -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="ForegroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="White"/>
+    <SolidColorBrush x:Key="MenuBackgroundBrush" Color="White"/>
+    <SolidColorBrush x:Key="TabItemBackgroundBrush" Color="{StaticResource TabItemBackground}"/>
+    <SolidColorBrush x:Key="TabItemForegroundBrush" Color="{StaticResource TabItemForeground}"/>
+    <SolidColorBrush x:Key="TabItemBorderBrush" Color="{StaticResource TabItemBorder}"/>
+    <SolidColorBrush x:Key="TabItemSelectedBackgroundBrush" Color="{StaticResource TabItemSelectedBackground}"/>
+    <SolidColorBrush x:Key="TabItemSelectedForegroundBrush" Color="{StaticResource TabItemSelectedForeground}"/>
+    <SolidColorBrush x:Key="TabItemSelectedBorderBrush" Color="{StaticResource TabItemSelectedBorder}"/>
+    <SolidColorBrush x:Key="TabItemHoverBackgroundBrush" Color="{StaticResource TabItemHoverBackground}"/>
+
+    <SolidColorBrush x:Key="TextEditorBackgroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="TextEditorForegroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="TreeViewBackgroundBrush" Color="#FFF5F5F5"/>
+    <SolidColorBrush x:Key="TreeViewForegroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="TreeViewItemForegroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="TabControlBackgroundBrush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="TabControlForegroundBrush" Color="#FF000000"/>
+    <SolidColorBrush x:Key="ListBorderBrush" Color="#FFCCCCCC"/>
+
+
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+    <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
+
+  
+    <SolidColorBrush x:Key="ListBoxBackgroundBrush" Color="{StaticResource ListBoxBackground}"/>
+    <SolidColorBrush x:Key="ListBoxForegroundBrush" Color="{StaticResource ListBoxForeground}"/>
+    <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="{StaticResource ButtonBackground}"/>
+    <SolidColorBrush x:Key="ButtonForegroundBrush" Color="{StaticResource ButtonForeground}"/>
+    <SolidColorBrush x:Key="ButtonHoverBackgroundBrush" Color="{StaticResource ButtonHoverBackground}"/>
+
+    
+    <Style TargetType="Window">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style TargetType="Menu">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+    </Style>
+    <Style TargetType="MenuItem">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HighlightBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    
+    <Style TargetType="ContextMenu">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    
+    
+    <Style TargetType="TreeView">
+        <Setter Property="Background" Value="{StaticResource TreeViewBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TreeViewForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    
+    <Style TargetType="TreeViewItem">
+        <Setter Property="Foreground" Value="{StaticResource TreeViewForegroundBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource HighlightBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    
+    <Style TargetType="TabControl">
+        <Setter Property="Background" Value="{StaticResource TabControlBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TabControlForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabControl">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border x:Name="HeaderBorder"
+                            Grid.Row="0"
+                            Background="{StaticResource TabControlBackgroundBrush}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="0,0,0,1">
+                            <TabPanel x:Name="HeaderPanel"
+                                  IsItemsHost="True"
+                                  Margin="0,0,0,0"/>
+                        </Border>
+
+                        <Border x:Name="ContentBorder"
+                            Grid.Row="1"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                          ContentSource="SelectedContent"
+                                          Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ScrollViewer">
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+    </Style>
+    
+    
+    <Style TargetType="avalonEdit:TextEditor">
+        <Setter Property="Background" Value="{StaticResource TextEditorBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextEditorForegroundBrush}"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="FontSize" Value="12pt"/>
+        <Setter Property="ShowLineNumbers" Value="True"/>
+        <Setter Property="WordWrap" Value="False"/>
+    </Style>
+
+    <Style TargetType="TabItem">
+        <Setter Property="Background" Value="{StaticResource TabItemBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource TabItemForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource TabItemBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1,1,1,0"/>
+        <Setter Property="Padding" Value="10,5"/>
+        <Setter Property="Margin" Value="0,0,-1,0"/>
+
+        <Style.Triggers>
+            
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource TabItemSelectedBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource TabItemSelectedForegroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource TabItemSelectedBorderBrush}"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+            </Trigger>
+
+            
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource TabItemHoverBackgroundBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="#cfcfcf"/>
+        <Setter Property="Foreground" Value="{StaticResource ButtonForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="#c2c2c2"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="1"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="3">
+                        <ContentPresenter x:Name="ContentSite"
+                                          ContentSource="Content"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource ButtonHoverBackgroundBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="ContentSite" Property="TextElement.Foreground" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="#000000"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="4"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Стиль TextBlock -->
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Стиль Label -->
+    <Style TargetType="Label">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+        <Setter Property="Margin" Value="4"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <Style TargetType="fa:ImageAwesome">
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    
+    <Style TargetType="ListBox">
+        <Setter Property="Background" Value="{StaticResource ListBoxBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ListBoxForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="#616161"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style TargetType="ListBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource ListBoxForegroundBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource HighlightBrush}"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource ButtonHoverBackgroundBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Видимый стиль MenuItem -->
+    <Style x:Key="VisibleMenuItem" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+        <Setter Property="Visibility" Value="Visible"/>
+    </Style>
+
+    <!-- Скрытый стиль MenuItem -->
+    <Style x:Key="CollapsedMenuItem" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+        <Setter Property="Visibility" Value="Collapsed"/>
+    </Style>
+</ResourceDictionary>

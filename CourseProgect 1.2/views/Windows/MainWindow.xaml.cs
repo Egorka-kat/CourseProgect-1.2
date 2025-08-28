@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CourseProgect_1._2.models;
+using CourseProgect_1._2.Models;
+using CourseProgect_1._2.Services;
+using CourseProgect_1._2.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace CourseProgect_1._2
 {
@@ -20,9 +13,23 @@ namespace CourseProgect_1._2
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        internal MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
         public MainWindow()
         {
+            ThemeService.ApplyTheme(ThemeService.CurrentTheme);
+
             InitializeComponent();
+            DataContext = new MainWindowViewModel();
+            InitializeComponent();
+        }
+
+        private void ListBox_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.SelectedItem is Progect Item)
+            {
+                ViewModel.CommandOpenProgramm.Execute(Item);
+            }
         }
     }
 }
